@@ -47,7 +47,7 @@ class MusicSettings:
 class UserCache:
     last_volume: int
     last_directory: str | None
-    repeat: RepeatOption
+    repeat_option: RepeatOption
 
     def __init__(self):
         self.last_volume = 50
