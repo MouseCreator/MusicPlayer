@@ -7,6 +7,9 @@ os.add_dll_directory(os.getcwd())
 import vlc
 
 class VLCPlayer(AbstractPlayer):
+    def get_state(self) -> str:
+        return "null"
+
     _player: vlc.MediaPlayer
 
     def get_time_millis(self) -> int:

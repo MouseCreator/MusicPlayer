@@ -83,9 +83,15 @@ class SeekFrame:
     def __init__(self, root: tk.Tk):
         self._seekbar = ttk.Scale(root, from_=0, to=100, orient=tk.HORIZONTAL, command=self._on_scale_change)
         self._seekbar.pack(pady=20, padx=20, fill=tk.X)
+        self._is_moved_by_user = False
 
     def _on_scale_change(self, value):
         pass
+
+    def update(self, new_value):
+        if self._is_moved_by_user:
+            return
+        self._seekbar.set(new_value)
 
 class ControlFrame:
     def __init__(self, root: tk.Tk, event_registry: EventRegistry, database: DataBase):

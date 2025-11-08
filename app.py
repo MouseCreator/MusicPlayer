@@ -3,7 +3,7 @@ import tkinter as tk
 from database import DataBase
 from elements import CoreLayout
 from events import EventRegistry
-from player.PyGamePlayer import PyGamePlayer
+from player.PygletPlayer import PygletPlayer
 
 class Application:
 
@@ -11,7 +11,7 @@ class Application:
         self.root = tk.Tk()
         self.event_registry = EventRegistry()
         self.database = DataBase(self.event_registry)
-        self.player = PyGamePlayer()
+        self.player = PygletPlayer()
 
     def _setup_layout(self):
         self.core = CoreLayout(self.root, self.event_registry, self.database)
