@@ -78,6 +78,15 @@ class MusicList:
             item.remove()
         self.items.clear()
 
+
+class SeekFrame:
+    def __init__(self, root: tk.Tk):
+        self._seekbar = ttk.Scale(root, from_=0, to=100, orient=tk.HORIZONTAL, command=self._on_scale_change)
+        self._seekbar.pack(pady=20, padx=20, fill=tk.X)
+
+    def _on_scale_change(self, value):
+        pass
+
 class ControlFrame:
     def __init__(self, root: tk.Tk, event_registry: EventRegistry, database: DataBase):
         self._control_frame = tk.Frame(root)
@@ -135,8 +144,10 @@ class BottomPanel:
 
     def _on_play_pause(self):
         self._database.update_playback()
+
     def _on_repeat(self):
         self._database.update_repeat()
+
     def _on_speed_change(self):
         self._database.update_speed(float(self.speed_spin.get()))
 
@@ -164,5 +175,6 @@ class BottomPanel:
 class CoreLayout:
     def __init__(self, root: tk.Tk, event_registry: EventRegistry, database: DataBase):
         self._control = ControlFrame(root, event_registry, database)
+        self._seek = SeekFrame(root)
         self._music_list = MusicList(root, event_registry, database)
         self._bottom_panel = BottomPanel(root, event_registry, database)
