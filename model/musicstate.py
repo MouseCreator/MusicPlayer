@@ -22,7 +22,7 @@ def initial_data() -> StateRecord:
     return record
 
 
-class State:
+class MusicState:
 
     def __init__(self, callback: Callback[Self] | None, initial: StateRecord | None):
         if not callback:
