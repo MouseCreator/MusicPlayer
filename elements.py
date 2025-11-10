@@ -78,6 +78,10 @@ class MusicList:
             item.remove()
         self.items.clear()
 
+    def add(self, musics: List[Music]):
+        for s in musics:
+            self._load_song(s)
+
 
 class SeekFrame:
     def __init__(self, root: tk.Tk):
@@ -184,3 +188,6 @@ class CoreLayout:
         self._seek = SeekFrame(root)
         self._music_list = MusicList(root, event_registry, database)
         self._bottom_panel = BottomPanel(root, event_registry, database)
+
+    def add_music(self, musics: List[Music]):
+        self._music_list.add(musics)

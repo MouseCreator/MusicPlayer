@@ -44,3 +44,14 @@ class CachableLoadServiceImpl(LoadService):
 
     def get_initial_directory(self) -> str | None:
         return self._user_cache.last_directory
+
+class Loader:
+    def __init__(self, load_service: LoadService):
+        self._load_service = load_service
+
+    def load(self, filenames: List[str]):
+        music_list = self._load_service.load_music(filenames)
+        self._apply_music_list(music_list)
+
+    def _apply_music_list(self, music_list: List[Music]):
+        pass
