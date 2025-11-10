@@ -1,6 +1,6 @@
 
 from typing import List, Self
-from data import Music
+from model.music import Music
 from model.callback import Callback, EmptyCallback
 
 

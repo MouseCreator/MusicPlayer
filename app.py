@@ -1,7 +1,7 @@
 import tkinter as tk
 from typing import List
 
-from data import Music
+from model.music import Music
 from database import DataBase
 from elements import CoreLayout
 from events import EventRegistry

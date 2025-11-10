@@ -1,12 +1,13 @@
 from typing import Self
 
 from callback import Callback, EmptyCallback
+from model.music import RepeatOption
 
 
 class StateRecord:
     volume: int
     speed: float
-    last_folder: str | None
+    repeat_option: RepeatOption
 
     def __init__(self):
         pass
@@ -18,7 +19,7 @@ def initial_data() -> StateRecord:
     record = StateRecord()
     record.volume = 100
     record.speed = 1.0
-    record.last_folder = None
+    record.repeat_option = RepeatOption.NO_REPEAT
     return record
 
 
@@ -30,14 +31,14 @@ class MusicState:
 
         if initial is None:
             initial = initial_data()
-        self.state = initial
-        self.callback = callback
+        self._state = initial
+        self._callback = callback
 
     def get_record(self) -> StateRecord:
-        return self.state.clone()
+        return self._state.clone()
     def set_volume(self):
-        self.callback.call(self)
+        self._callback.call(self)
     def set_speed(self):
-        self.callback.call(self)
+        self._callback.call(self)
     def set_playing(self):
-        self.callback.call(self)
+        self._callback.call(self)

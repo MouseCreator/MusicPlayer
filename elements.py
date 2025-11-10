@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import filedialog, ttk
 from typing import List
 
-from data import Music
+from model.music import Music
 from database import DataBase
 from events import EventRegistry, LoadSongsEvent, SortSongsEvent, ShuffleSongsEvent, ClearSongsEvent
 from utils import display_time

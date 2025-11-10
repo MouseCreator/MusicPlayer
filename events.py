@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import List, Dict
 
-from data import MusicState, RepeatOption
+from model.music import MusicState, RepeatOption
 
 class Event(ABC):
     pass

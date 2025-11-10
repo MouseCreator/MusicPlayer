@@ -1,4 +1,4 @@
-from data import MusicState, RepeatOption, MusicSettings
+from model.music import MusicState, RepeatOption, MusicSettings
 
 
 class CacheService:
@@ -17,17 +17,17 @@ class MusicSettingsService:
         self.cache_service = cache_service
 
     def update_playback(self) -> MusicState:
-        if self.settings.state == MusicState.FINISHED:
+        if self.settings._state == MusicState.FINISHED:
             self.settings.time = 0
-            self.settings.state = MusicState.PLAYING
-        elif self.settings.state == MusicState.PLAYING:
-            self.settings.state = MusicState.PAUSED
-        elif self.settings.state == MusicState.PAUSED:
-            self.settings.state = MusicState.PLAYING
-        return self.settings.state
+            self.settings._state = MusicState.PLAYING
+        elif self.settings._state == MusicState.PLAYING:
+            self.settings._state = MusicState.PAUSED
+        elif self.settings._state == MusicState.PAUSED:
+            self.settings._state = MusicState.PLAYING
+        return self.settings._state
 
     def finish(self):
-        self.settings.state = MusicState.FINISHED
+        self.settings._state = MusicState.FINISHED
 
     def update_speed(self, speed: float) -> None:
         self.settings.speed = speed

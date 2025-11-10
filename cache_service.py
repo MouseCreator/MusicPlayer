@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from data import RepeatOption, UserCache
+from model.music import RepeatOption, UserCache
 
 
 class CacheService(ABC):

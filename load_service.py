@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from cache_service import CacheService
-from data import Playlist, UserCache, Music
+from model.music import Playlist, UserCache, Music
 
 def convert(files: List[str]) -> List[Music]:
     result = []
