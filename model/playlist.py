@@ -1,11 +1,15 @@
 
 from typing import List, Self
 from data import Music
-from model.callback import Callback
+from model.callback import Callback, EmptyCallback
+
 
 class Playlist:
 
-    def __init__(self, callback: Callback[Self]):
+    def __init__(self, callback: Callback[Self] | None):
+        if not callback:
+            callback = EmptyCallback()
+
         self.callback = callback
         self.music_list = []
 
