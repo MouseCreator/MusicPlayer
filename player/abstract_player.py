@@ -28,7 +28,7 @@ class AbstractPlayer(ABC):
     def set_volume(self, volume: int):
         pass
     @abstractmethod
-    def set_speed(self, speed: int):
+    def set_speed(self, speed: float):
         pass
     @abstractmethod
     def set_time_millis(self, millis: int):

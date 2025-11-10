@@ -19,7 +19,6 @@ class Application:
     def begin(self):
         self._setup_layout()
         self.player.set_file('melodies/melody.wav')
-        self.player.play()
         self.root.mainloop()
 
 

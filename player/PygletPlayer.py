@@ -82,11 +82,11 @@ class PygletPlayer(AbstractPlayer):
         v = volume / 100.0
         self._player.volume = float(v)
 
-    def set_speed(self, speed: int):
+    def set_speed(self, speed: float):
         if not self._has_media():
             return
         pct = max(0.1, speed)
-        self._player.pitch = float(pct) / 100.0
+        self._player.pitch = float(pct)
 
     def set_time_millis(self, millis: int):
         if not self._has_media():
