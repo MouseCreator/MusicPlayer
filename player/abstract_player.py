@@ -5,7 +5,7 @@ from model.music import PlaybackState
 
 class AbstractPlayer(ABC):
     @abstractmethod
-    def set_file(self, filepath: str):
+    def set_file(self, filepath: str | None):
         pass
 
     @abstractmethod

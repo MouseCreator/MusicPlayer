@@ -11,7 +11,7 @@ class PyGamePlayer(AbstractPlayer):
         self._paused = False
         self._length = 0
 
-    def set_file(self, filepath: str):
+    def set_file(self, filepath: str  | None):
         self.filepath = filepath
         pygame.mixer.music.load(filepath)
         self._length = pygame.mixer.Sound(filepath).get_length() * 1000

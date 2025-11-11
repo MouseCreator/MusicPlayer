@@ -40,7 +40,7 @@ class MusicState:
         self._state.volume = volume
         self._callback.call(self)
 
-    def set_speed(self, speed: int):
+    def set_speed(self, speed: float):
         self._state.speed = speed
         self._callback.call(self)
 

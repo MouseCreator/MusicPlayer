@@ -20,7 +20,7 @@ class PygletPlayer(AbstractPlayer):
     def _has_media(self) -> bool:
         return self._source is not None
 
-    def set_file(self, filepath: str):
+    def set_file(self, filepath: str | None):
         try:
             self._player.delete()
         except Exception:

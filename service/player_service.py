@@ -28,6 +28,9 @@ class PlayerService(MusicStateEventListener, CurrentMusicEventListener, Playback
 
     def on_current_music_event(self, event: ModelEvent[CurrentSong]):
         music = event.get().get_current()
+        if music is None:
+            self._player.set_file(None)
+            self._models.playback.set_playback(PlaybackState.FINISHED)
         self._player.set_file(music.filename)
         self._player.set_time_millis(0)
         self._models.playback.set_playback(PlaybackState.PLAYING)

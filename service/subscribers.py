@@ -20,6 +20,11 @@ class Subscribers(ABC):
     def subscribe(self, listener: EventListener):
         pass
 
+    def subscribe_all(self, listeners: List[EventListener]):
+        for listener in listeners:
+            self.subscribe(listener)
+
+
 class MappedSubscribers(Subscribers):
 
     def __init__(self):

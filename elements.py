@@ -4,9 +4,14 @@ import tkinter as tk
 from tkinter import filedialog, ttk
 from typing import List
 
-from model.music import Music
-from database import DataBase
-from events import EventRegistry, LoadSongsEvent, SortSongsEvent, ShuffleSongsEvent, ClearSongsEvent
+from model.model_event import PlaylistEventListener, ModelEvent, PlaybackEventListener, MusicStateEventListener
+from model.models import Models
+from model.music import Music, RepeatOption, PlaybackState
+from model.musicstate import MusicState
+from model.playback import Playback
+from model.playlist import Playlist
+from service.load_service import LoadService
+from service.subscribers import Subscribers
 from utils import display_time
 
 
@@ -27,10 +32,35 @@ class FileLoader:
         abs_paths = [os.path.abspath(path) for path in filenames]
         return abs_paths
 
+
+class ControlFrame:
+    def __init__(self, root: tk.Tk, models: Models, load_service: LoadService):
+        self._models = models
+        self._load_service = load_service
+
+        self._control_frame = tk.Frame(root)
+        self._control_frame.pack(fill=tk.X, pady=5)
+
+        tk.Button(self._control_frame, text="Load", command=self._load_file).pack(side=tk.LEFT, padx=5)
+        tk.Button(self._control_frame, text="Sort", command=self._sort_list).pack(side=tk.LEFT, padx=5)
+        tk.Button(self._control_frame, text="Shuffle", command=self._shuffle_list).pack(side=tk.LEFT, padx=5)
+        tk.Button(self._control_frame, text="Clear", command=self._clear_list).pack(side=tk.LEFT, padx=5)
+
+    def _load_file(self):
+        last_folder = self._models.load_state.get_last_folder()
+        files = FileLoader.load(last_folder)
+        self._load_service.load_files(files)
+    def _sort_list(self):
+        self._models.playlist.sort()
+    def _shuffle_list(self):
+        self._models.playlist.shuffle()
+    def _clear_list(self):
+        self._models.playlist.clear()
+        self._models.current.clear()
+
 class MusicItem:
-    def __init__(self, database: DataBase, parent: tk.Frame, music: Music):
+    def __init__(self, parent: tk.Frame, music: Music):
         self.music = music
-        self.database = database
         self.item_frame = tk.Frame(parent, bd=1, relief=tk.RAISED, padx=5, pady=5)
         self.item_frame.pack(fill=tk.X, pady=2)
 
@@ -41,17 +71,18 @@ class MusicItem:
         tk.Button(self.item_frame, text="Remove", width=7, command=self.remove).pack(side=tk.LEFT, padx=2)
 
     def play(self):
-        self.database.play_id(self.music.id)
+        pass
     def remove(self):
-        self.item_frame.destroy()
+        pass
 
 
-class MusicList:
-    def __init__(self, root: tk.Tk, event_registry: EventRegistry, database: DataBase):
+class MusicList(PlaylistEventListener):
+    def on_playlist_event(self, event: ModelEvent[Playlist]):
+        pass
+
+    def __init__(self, root: tk.Tk):
         self.list_frame = tk.Frame(root)
         self.items: List[MusicItem] = []
-        self.database = database
-        self.event_registry = event_registry
         self.list_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
 
         self.canvas = tk.Canvas(self.list_frame)
@@ -69,19 +100,6 @@ class MusicList:
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-    def _load_song(self, music: Music):
-        item = MusicItem(self.database, self.list_frame, music)
-        self.items.append(item)
-
-    def _clear(self):
-        for item in self.items:
-            item.remove()
-        self.items.clear()
-
-    def add(self, musics: List[Music]):
-        for s in musics:
-            self._load_song(s)
-
 
 class SeekFrame:
     def __init__(self, root: tk.Tk):
@@ -97,32 +115,11 @@ class SeekFrame:
             return
         self._seekbar.set(new_value)
 
-class ControlFrame:
-    def __init__(self, root: tk.Tk, event_registry: EventRegistry, database: DataBase):
-        self._control_frame = tk.Frame(root)
-        self._control_frame.pack(fill=tk.X, pady=5)
-        self._event_registry = event_registry
-        self._database = database
 
-        tk.Button(self._control_frame, text="Load", command=self._load_file).pack(side=tk.LEFT, padx=5)
-        tk.Button(self._control_frame, text="Sort", command=self._sort_list).pack(side=tk.LEFT, padx=5)
-        tk.Button(self._control_frame, text="Shuffle", command=self._shuffle_list).pack(side=tk.LEFT, padx=5)
-        tk.Button(self._control_frame, text="Clear", command=self._clear_list).pack(side=tk.LEFT, padx=5)
+class BottomPanel(PlaybackEventListener, MusicStateEventListener):
 
-    def _load_file(self):
-        paths = FileLoader.load(self._database.get_cache().last_directory)
-        self._event_registry.register("list", LoadSongsEvent(paths))
-    def _sort_list(self):
-        self._event_registry.register("list", SortSongsEvent())
-    def _shuffle_list(self):
-        self._event_registry.register("list", ShuffleSongsEvent())
-    def _clear_list(self):
-        self._event_registry.register("list", ClearSongsEvent())
-
-class BottomPanel:
-    def __init__(self, root: tk.Tk, event_registry: EventRegistry, database: DataBase):
-        self._event_registry = event_registry
-        self._database = database
+    def __init__(self, root: tk.Tk, models: Models):
+        self._models = models
         self.bottom_frame = tk.Frame(root)
         self.bottom_frame.pack(fill=tk.X, side=tk.BOTTOM, pady=5)
 
@@ -153,13 +150,26 @@ class BottomPanel:
         self.speed_spin.bind("<Return>", self._on_enter)
 
     def _on_play_pause(self):
-        self._database.update_playback()
+        playback = self._models.playback.get_playback()
+        if playback == PlaybackState.PLAYING:
+            self._models.playback.set_playback(PlaybackState.PAUSED)
+        elif playback == PlaybackState.PAUSED:
+            self._models.playback.set_playback(PlaybackState.PLAYING)
 
     def _on_repeat(self):
-        self._database.update_repeat()
+        repeat = self._models.state.get_record().repeat_option
+        if repeat == RepeatOption.NO_REPEAT:
+            self._models.state.set_repeat_option(RepeatOption.REPEAT_ALL)
+        elif repeat == RepeatOption.REPEAT_ALL:
+            self._models.state.set_repeat_option(RepeatOption.REPEAT_ONE)
+        elif repeat == RepeatOption.REPEAT_ONE:
+            self._models.state.set_repeat_option(RepeatOption.NO_REPEAT)
 
     def _on_speed_change(self):
-        self._database.update_speed(float(self.speed_spin.get()))
+        self._models.state.set_speed(float(self.speed_spin.get()))
+
+    def _on_volume_change(self):
+        self._models.state.set_volume(100)
 
     def _validate_speed(self, new_value):
         if new_value == "":
@@ -182,12 +192,16 @@ class BottomPanel:
         self.speed_var.set(f"{value:.1f}")
         self._on_speed_change()
 
-class CoreLayout:
-    def __init__(self, root: tk.Tk, event_registry: EventRegistry, database: DataBase):
-        self._control = ControlFrame(root, event_registry, database)
-        self._seek = SeekFrame(root)
-        self._music_list = MusicList(root, event_registry, database)
-        self._bottom_panel = BottomPanel(root, event_registry, database)
+    def on_music_state_event(self, event: ModelEvent[MusicState]):
+        pass
 
-    def add_music(self, musics: List[Music]):
-        self._music_list.add(musics)
+    def on_playback_changed(self, event: ModelEvent[Playback]):
+        pass
+
+class CoreLayout:
+    def __init__(self, root: tk.Tk, models: Models, subs: Subscribers):
+        self._control = ControlFrame(root, models)
+        self._seek = SeekFrame(root)
+        self._music_list = MusicList(root)
+        self._bottom_panel = BottomPanel(root)
+        subs.subscribe_all([self._seek, self._music_list, self._bottom_panel])

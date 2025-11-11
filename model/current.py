@@ -11,9 +11,12 @@ class CurrentSong:
         self._music = None
         self._callback = callback
 
-    def set_current(self, music: Music):
+    def set_current(self, music: Music | None):
         self._music = music
         self._callback.call(self)
 
     def get_current(self) -> Music:
         return self._music
+
+    def clear(self):
+        self.set_current(None)
