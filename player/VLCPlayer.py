@@ -1,14 +1,15 @@
 import os
 
 from abstract_player import AbstractPlayer
+from model.music import PlaybackState
 
 os.add_dll_directory(os.getcwd())
 
 import vlc
 
 class VLCPlayer(AbstractPlayer):
-    def get_state(self) -> str:
-        return "null"
+    def get_state(self) -> PlaybackState:
+        return PlaybackState.FINISHED
 
     _player: vlc.MediaPlayer
 

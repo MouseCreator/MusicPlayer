@@ -4,6 +4,7 @@ from typing import TypeVar, Generic
 from model.current import CurrentSong
 from model.load_state import LoadState
 from model.musicstate import MusicState
+from model.playback import Playback
 from model.playlist import Playlist
 from model.timer import MusicTimer
 
@@ -50,3 +51,7 @@ class LoadStateEventListener(EventListener):
     def on_load_sate_event(self, event: ModelEvent[LoadState]):
         pass
 
+class PlaybackEventListener(EventListener):
+    @abstractmethod
+    def on_playback_changed(self, event: ModelEvent[Playback]):
+        pass

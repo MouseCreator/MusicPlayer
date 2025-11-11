@@ -4,8 +4,9 @@ from typing import TypeVar, Dict, Type, List, Callable
 from model.current import CurrentSong
 from model.load_state import LoadState
 from model.model_event import ModelEvent, EventListener, LoadStateEventListener, MusicStateEventListener, \
-    PlaylistEventListener, TimerEventListener, CurrentMusicEventListener
+    PlaylistEventListener, TimerEventListener, CurrentMusicEventListener, PlaybackEventListener
 from model.musicstate import MusicState
+from model.playback import Playback
 from model.playlist import Playlist
 from model.timer import MusicTimer
 
@@ -37,6 +38,7 @@ class MappedSubscribers(Subscribers):
             (PlaylistEventListener,     Playlist,    "on_playlist_event"),
             (MusicStateEventListener,   MusicState,  "on_music_state_event"),
             (LoadStateEventListener,    LoadState,   "on_load_sate_event"),
+            (PlaybackEventListener,     Playback,    "on_playback_changed")
         ]
 
         for listener_type, event_type, method_name in listener_map:

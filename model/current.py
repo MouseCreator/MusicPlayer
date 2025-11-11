@@ -14,3 +14,6 @@ class CurrentSong:
     def set_current(self, music: Music):
         self._music = music
         self._callback.call(self)
+
+    def get_current(self) -> Music:
+        return self._music

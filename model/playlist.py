@@ -10,26 +10,35 @@ class Playlist:
         if not callback:
             callback = EmptyCallback()
 
-        self.callback = callback
-        self.music_list = []
+        self._callback = callback
+        self._music_list = []
 
     def append(self, music_list: List[Music]):
-        self.music_list.extend(music_list)
-        self.callback.call(self)
+        self._music_list.extend(music_list)
+        self._callback.call(self)
 
     def view(self) -> List[Music]:
-        return list(self.music_list)
+        return list(self._music_list)
 
     def set_position(self, music: Music, position: int):
-        self.music_list.remove(music)
-        self.music_list.insert(position, music)
-        self.callback.call(self)
+        self._music_list.remove(music)
+        self._music_list.insert(position, music)
+        self._callback.call(self)
 
     def remove(self, music: Music):
-        self.music_list.remove(music)
-        self.callback.call(self)
+        self._music_list.remove(music)
+        self._callback.call(self)
 
     def clear(self):
-        self.music_list.clear()
-        self.callback.call(self)
+        self._music_list.clear()
+        self._callback.call(self)
+
+    def index_of(self, music: Music):
+        return self._music_list.index(music)
+
+    def size(self):
+        return len(self._music_list)
+
+    def at_index(self, index: int):
+        return self._music_list[index]
 

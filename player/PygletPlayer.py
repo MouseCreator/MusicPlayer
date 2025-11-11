@@ -1,3 +1,4 @@
+from model.music import PlaybackState
 from player.abstract_player import AbstractPlayer
 import pyglet
 from typing import Optional
@@ -59,16 +60,16 @@ class PygletPlayer(AbstractPlayer):
         self._player.play()
         self._paused = False
 
-    def get_state(self) -> str:
+    def get_state(self) -> PlaybackState:
         if not self._has_media():
-            return "finished"
+            return PlaybackState.FINISHED
         if self._player.playing:
-            return "playing"
+            return PlaybackState.PLAYING
         if self._ended:
-            return "finished"
+            return PlaybackState.FINISHED
         if self._paused:
-            return "paused"
-        return "finished"
+            return PlaybackState.PAUSED
+        return PlaybackState.FINISHED
 
     def get_time_millis(self) -> int:
         if not self._has_media():

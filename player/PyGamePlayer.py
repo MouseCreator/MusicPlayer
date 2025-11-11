@@ -1,5 +1,7 @@
 
 import pygame
+
+from model.music import PlaybackState
 from player.abstract_player import AbstractPlayer
 
 class PyGamePlayer(AbstractPlayer):
@@ -31,13 +33,13 @@ class PyGamePlayer(AbstractPlayer):
             pygame.mixer.music.unpause()
             self._paused = False
 
-    def get_state(self) -> str:
+    def get_state(self) -> PlaybackState:
         if self._paused:
-            return "paused"
+            return PlaybackState.PAUSED
         elif pygame.mixer.music.get_busy():
-            return "playing"
+            return PlaybackState.PLAYING
         else:
-            return "finished"
+            return PlaybackState.FINISHED
 
     def get_time_millis(self) -> int:
         return pygame.mixer.music.get_pos()

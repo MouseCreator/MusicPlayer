@@ -8,6 +8,7 @@ from model.load_state import LoadState
 from model.model_event import ModelEvent
 from model.models import Models
 from model.musicstate import MusicState, StateRecord
+from model.playback import Playback
 from model.playlist import Playlist
 from model.timer import MusicTimer
 from service.subscribers import Subscribers
@@ -57,5 +58,6 @@ class ModelsInitializerImpl(ModelsInitializer):
         state = MusicState(callback=callbacks.generate_event(), initial=initial_settings)
         timer = MusicTimer(callback=callbacks.generate_event())
         load_state = LoadState(callback=callbacks.generate_event())
+        playback = Playback(callback=callbacks.generate_event())
 
-        return Models(current, playlist, state, timer, load_state)
+        return Models(current, playlist, state, timer, load_state, playback)
