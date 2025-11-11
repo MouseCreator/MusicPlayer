@@ -22,7 +22,6 @@ def initial_data() -> StateRecord:
     record.repeat_option = RepeatOption.NO_REPEAT
     return record
 
-
 class MusicState:
 
     def __init__(self, callback: Callback[Self] | None, initial: StateRecord | None):
@@ -36,9 +35,15 @@ class MusicState:
 
     def get_record(self) -> StateRecord:
         return self._state.clone()
-    def set_volume(self):
+
+    def set_volume(self, volume: int):
+        self._state.volume = volume
         self._callback.call(self)
-    def set_speed(self):
+
+    def set_speed(self, speed: int):
+        self._state.speed = speed
         self._callback.call(self)
-    def set_playing(self):
+
+    def set_repeat_option(self, repeat: RepeatOption):
+        self._state.repeat_option = repeat
         self._callback.call(self)

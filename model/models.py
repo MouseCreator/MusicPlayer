@@ -1,4 +1,5 @@
 from model.current import CurrentSong
+from model.load_state import LoadState
 from model.playlist import Playlist
 from model.musicstate import MusicState
 from model.timer import MusicTimer
@@ -14,9 +15,11 @@ class Models:
                  current: CurrentSong,
                  playlist: Playlist,
                  state: MusicState,
-                 timer: MusicTimer
+                 timer: MusicTimer,
+                 load_state: LoadState
                  ):
         self.current = current
         self.playlist = playlist
         self.state = state
         self.timer = timer
+        self.load_state = load_state

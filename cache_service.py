@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 
-from model.music import RepeatOption, UserCache
+from model.cached_data import CachedData
+from model.music import RepeatOption
+
 
 
 class CacheService(ABC):
@@ -17,7 +19,7 @@ class CacheService(ABC):
         pass
 
     @abstractmethod
-    def load_cache(self) -> UserCache:
+    def load_cache(self) -> CachedData:
         pass
 
 
@@ -40,8 +42,8 @@ class CacheServiceImpl(ABC):
         self._save_cache(cached_data)
 
     @abstractmethod
-    def load_cache(self) -> UserCache:
+    def load_cache(self) -> CachedData:
         pass
 
-    def _save_cache(self, cached_data: UserCache):
+    def _save_cache(self, cached_data: CachedData):
         pass

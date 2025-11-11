@@ -18,7 +18,7 @@ class RepeatOption(Enum):
     REPEAT_ONE = 2
     REPEAT_ALL = 3
 
-class MusicState(Enum):
+class PlaybackState(Enum):
     PLAYING = 1
     PAUSED = 2
     FINISHED = 3

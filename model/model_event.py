@@ -17,43 +17,29 @@ class ModelEvent(ABC, Generic[T]):
     def get(self) -> T:
         return self._t
 
-class CurrentMusicEvent(ModelEvent[CurrentSong]):
-    pass
 
 class CurrentMusicEventListener(ABC):
     @abstractmethod
-    def on_current_music_event(self, event: CurrentMusicEvent):
+    def on_current_music_event(self, event: ModelEvent[CurrentSong]):
         pass
-
-class TimerEvent(ModelEvent[MusicTimer]):
-    pass
 
 class TimerEventListener(ABC):
     @abstractmethod
-    def on_timer_event(self, event: TimerEvent):
+    def on_timer_event(self, event: ModelEvent[MusicTimer]):
         pass
-
-class PlaylistEvent(ModelEvent[Playlist]):
-    pass
 
 class PlaylistEventListener(ABC):
     @abstractmethod
-    def on_playlist_event(self, event: PlaylistEvent):
+    def on_playlist_event(self, event: ModelEvent[Playlist]):
         pass
-
-class MusicStateEvent(ModelEvent[MusicState]):
-    pass
 
 class MusicStateEventListener(ABC):
     @abstractmethod
-    def on_music_state_event(self, event: MusicStateEvent):
+    def on_music_state_event(self, event: ModelEvent[MusicState]):
         pass
-
-class LoadStateEvent(ModelEvent[LoadState]):
-    pass
 
 class LoadStateEventListener(ABC):
     @abstractmethod
-    def on_load_sate_event(self, event: LoadStateEvent):
+    def on_load_sate_event(self, event: ModelEvent[LoadState]):
         pass
 
