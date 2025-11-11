@@ -13,32 +13,39 @@ class ModelEvent(ABC, Generic[T]):
     _t: T
     def __init__(self, t: T):
         self._t = t
+        self._event_type: type[T] = type(t)
 
     def get(self) -> T:
         return self._t
 
+    def generic(self):
+        return self._event_type
 
-class CurrentMusicEventListener(ABC):
+
+class EventListener(ABC):
+    pass
+
+class CurrentMusicEventListener(EventListener):
     @abstractmethod
     def on_current_music_event(self, event: ModelEvent[CurrentSong]):
         pass
 
-class TimerEventListener(ABC):
+class TimerEventListener(EventListener):
     @abstractmethod
     def on_timer_event(self, event: ModelEvent[MusicTimer]):
         pass
 
-class PlaylistEventListener(ABC):
+class PlaylistEventListener(EventListener):
     @abstractmethod
     def on_playlist_event(self, event: ModelEvent[Playlist]):
         pass
 
-class MusicStateEventListener(ABC):
+class MusicStateEventListener(EventListener):
     @abstractmethod
     def on_music_state_event(self, event: ModelEvent[MusicState]):
         pass
 
-class LoadStateEventListener(ABC):
+class LoadStateEventListener(EventListener):
     @abstractmethod
     def on_load_sate_event(self, event: ModelEvent[LoadState]):
         pass
