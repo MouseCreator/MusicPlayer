@@ -12,3 +12,4 @@ class Playback:
         return self._playback
     def set_playback(self, state: PlaybackState):
         self._playback = state
+        self._callback.call(self)

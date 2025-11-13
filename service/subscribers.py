@@ -8,7 +8,7 @@ from model.model_event import ModelEvent, EventListener, LoadStateEventListener,
 from model.musicstate import MusicState
 from model.playback import Playback
 from model.playlist import Playlist
-from model.timer import MusicTimer
+from model.timer import MusicTimer, MusicTimerEvent
 
 T = TypeVar('T')
 
@@ -39,7 +39,7 @@ class MappedSubscribers(Subscribers):
     def subscribe(self, listener: EventListener):
         listener_map = [
             (CurrentMusicEventListener, CurrentSong, "on_current_music_event"),
-            (TimerEventListener,        MusicTimer,  "on_timer_event"),
+            (TimerEventListener,        MusicTimerEvent,  "on_timer_event"),
             (PlaylistEventListener,     Playlist,    "on_playlist_event"),
             (MusicStateEventListener,   MusicState,  "on_music_state_event"),
             (LoadStateEventListener,    LoadState,   "on_load_sate_event"),

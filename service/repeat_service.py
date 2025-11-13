@@ -1,5 +1,5 @@
 from model.models import Models
-from model.music import RepeatOption, PlaybackState
+from model.music import RepeatOption
 
 
 class RepeatService:
@@ -19,13 +19,13 @@ class RepeatService:
 
     def _play_next_song(self, looped_list: bool):
         current = self._models.current.get_current()
+        if current is None:
+            return
         index = self._models.playlist.index_of(current)
         index = index + 1
-        if index > self._models.playlist.size():
+        if index >= self._models.playlist.size():
             if looped_list:
                 first = self._models.playlist.at_index(0)
                 self._models.current.set_current(first)
-            else:
-                self._models.timer.set_playback_state(PlaybackState.FINISHED)
         else:
-            self._models.current.get_current()
+            self._models.current.set_current(self._models.playlist.view()[index])

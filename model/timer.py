@@ -1,32 +1,17 @@
-from typing import Self
 
 from model.callback import Callback
-from model.music import PlaybackState
 
+class MusicTimerEvent:
+    def __init__(self,
+                 time_millis: int,
+                 is_manual: bool):
+        self.time_millis = time_millis
+        self.is_manual = is_manual
 
 class MusicTimer:
-    _current_millis: int
-    _playback_state: PlaybackState
-    _callback: Callback[Self]
 
-    def __init__(self, callback: Callback[Self]):
+    def __init__(self, callback: Callback[MusicTimerEvent]):
         self._callback = callback
-        self._duration_millis = 0
-        self._current_millis = 0
-        self._playback_state = PlaybackState.FINISHED
 
-    def set_playback_state(self, state: PlaybackState):
-        self._playback_state = state
-        self._callback.call(self)
-
-    def get_playback_sate(self):
-        return self._playback_state
-
-    def update_time(self, millis: int):
-        if millis < 0:
-            millis = 0
-        self._current_millis = millis
-        self._callback.call(self)
-
-    def get_time_millis(self) -> int:
-        return self._current_millis
+    def generate_event(self, millis: int, manual: bool):
+        self._callback.call(MusicTimerEvent(millis, manual))

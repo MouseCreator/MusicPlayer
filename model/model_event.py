@@ -6,7 +6,7 @@ from model.load_state import LoadState
 from model.musicstate import MusicState
 from model.playback import Playback
 from model.playlist import Playlist
-from model.timer import MusicTimer
+from model.timer import MusicTimerEvent
 
 T = TypeVar('T')
 
@@ -33,7 +33,7 @@ class CurrentMusicEventListener(EventListener):
 
 class TimerEventListener(EventListener):
     @abstractmethod
-    def on_timer_event(self, event: ModelEvent[MusicTimer]):
+    def on_timer_event(self, event: ModelEvent[MusicTimerEvent]):
         pass
 
 class PlaylistEventListener(EventListener):

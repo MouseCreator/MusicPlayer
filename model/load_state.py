@@ -5,9 +5,9 @@ from model.callback import Callback
 
 class LoadState:
     _last_folder: str | None
-    def __init__(self, callback: Callback[Self]):
+    def __init__(self, callback: Callback[Self],  last_folder: str | None):
         self._callback = callback
-        self._last_folder = None
+        self._last_folder = last_folder
 
     def set_last_folder(self, folder: str):
         self._last_folder = folder

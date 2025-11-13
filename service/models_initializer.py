@@ -57,7 +57,7 @@ class ModelsInitializerImpl(ModelsInitializer):
         playlist = Playlist(callback=callbacks.generate_event())
         state = MusicState(callback=callbacks.generate_event(), initial=initial_settings)
         timer = MusicTimer(callback=callbacks.generate_event())
-        load_state = LoadState(callback=callbacks.generate_event())
+        load_state = LoadState(callback=callbacks.generate_event(), last_folder=cache.last_folder)
         playback = Playback(callback=callbacks.generate_event())
 
         return Models(current, playlist, state, timer, load_state, playback)

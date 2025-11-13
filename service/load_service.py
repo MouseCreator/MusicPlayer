@@ -2,6 +2,8 @@ import os
 import uuid
 from typing import List
 
+import mutagen
+
 from model.models import Models
 from model.music import Music
 
@@ -10,12 +12,18 @@ class LoadService:
     def __init__(self, models: Models):
         self._models = models
 
+    def _get_duration_ms(self, path: str) -> int:
+        audio = mutagen.File(path)
+        if audio is None or not hasattr(audio, "info"):
+            return 0
+        return int(audio.info.length * 1000)
+
     def _convert_list(self, files: List[str]) -> List[Music]:
         music_list = []
 
         for filename in files:
             music = Music()
-            music.id = uuid.uuid4().int
+            music.id = str(uuid.uuid4())
             full_name = os.path.abspath(filename)
             base_name = os.path.basename(filename)
             name, ext = os.path.splitext(base_name)
@@ -23,6 +31,7 @@ class LoadService:
             music.filename = full_name
             music.extension = ext.lstrip(".")
             music.name = name
+            music.duration_millis = self._get_duration_ms(full_name)
 
             music_list.append(music)
 

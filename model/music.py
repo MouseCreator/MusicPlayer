@@ -1,13 +1,13 @@
 from enum import Enum
 
 class Music:
-    id: int
+    id: str
     duration_millis: int
     filename: str
     extension: str
     name: str
     def __init__(self):
-        self.id = -1
+        self.id = ""
         self.duration_millis = 0
         self.filename = ""
         self.extension = ""

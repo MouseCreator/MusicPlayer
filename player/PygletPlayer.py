@@ -35,6 +35,9 @@ class PygletPlayer(AbstractPlayer):
         def on_eos():
             self._ended = True
             self._player.pause()
+
+        if filepath is None:
+            return
         self._source = pyglet.media.load(filepath, streaming=True)
         self._player.queue(self._source)
 
