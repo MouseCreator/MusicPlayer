@@ -2,15 +2,19 @@ import os
 
 import tkinter as tk
 from tkinter import filedialog, ttk
-from typing import List
+from typing import List, Callable
 
-from model.model_event import PlaylistEventListener, ModelEvent, PlaybackEventListener, MusicStateEventListener
+from model.current import CurrentSong
+from model.model_event import PlaylistEventListener, ModelEvent, PlaybackEventListener, MusicStateEventListener, \
+    TimerEventListener, CurrentMusicEventListener
 from model.models import Models
 from model.music import Music, RepeatOption, PlaybackState
 from model.musicstate import MusicState
 from model.playback import Playback
 from model.playlist import Playlist
+from model.timer import MusicTimer
 from service.load_service import LoadService
+from service.services import Services
 from service.subscribers import Subscribers
 from utils import display_time
 
@@ -59,95 +63,174 @@ class ControlFrame:
         self._models.current.clear()
 
 class MusicItem:
-    def __init__(self, parent: tk.Frame, music: Music):
-        self.music = music
-        self.item_frame = tk.Frame(parent, bd=1, relief=tk.RAISED, padx=5, pady=5)
-        self.item_frame.pack(fill=tk.X, pady=2)
+    def __init__(self,
+                 parent: tk.Frame,
+                 music: Music,
+                 on_play: Callable[[Music], None],
+                 on_remove: Callable[[Music], None]
+                 ):
+        self._on_play = on_play
+        self._on_remove = on_remove
+        self._music = music
+        self._item_frame = tk.Frame(parent, bd=1, relief=tk.RAISED, padx=5, pady=5)
+        self._item_frame.pack(fill=tk.X, pady=2)
 
-        tk.Label(self.item_frame, text=music.name, anchor="w").pack(side=tk.LEFT, fill=tk.X, expand=True)
-        tk.Label(self.item_frame, text=display_time(music.duration_millis), width=6, anchor="e").pack(side=tk.LEFT, padx=5)
+        tk.Label(self._item_frame, text=music.name, anchor="w").pack(side=tk.LEFT, fill=tk.X, expand=True)
+        tk.Label(self._item_frame, text=display_time(music.duration_millis), width=6, anchor="e").pack(side=tk.LEFT, padx=5)
 
-        tk.Button(self.item_frame, text="Play", width=6, command=self.play).pack(side=tk.LEFT, padx=2)
-        tk.Button(self.item_frame, text="Remove", width=7, command=self.remove).pack(side=tk.LEFT, padx=2)
+        tk.Button(self._item_frame, text="Play", width=6, command=self._play).pack(side=tk.LEFT, padx=2)
+        tk.Button(self._item_frame, text="Remove", width=7, command=self._remove).pack(side=tk.LEFT, padx=2)
 
-    def play(self):
-        pass
-    def remove(self):
-        pass
+    def _play(self):
+        self._on_play(self._music)
+    def _remove(self):
+        self._on_remove(self._music)
+
+    def highlight(self):
+        self._item_frame['bg'] = 'lightblue'
+
+    def remove_highlight(self):
+        self._item_frame['bg'] = 'white'
+
+    def destroy(self):
+        self._item_frame.destroy()
+
+    def music(self):
+        return self._music
 
 
-class MusicList(PlaylistEventListener):
-    def on_playlist_event(self, event: ModelEvent[Playlist]):
-        pass
+class MusicList(PlaylistEventListener, CurrentMusicEventListener):
 
-    def __init__(self, root: tk.Tk):
-        self.list_frame = tk.Frame(root)
-        self.items: List[MusicItem] = []
-        self.list_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+    def __init__(self, root: tk.Tk, models: Models):
+        self._list_frame = tk.Frame(root)
+        self._list_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+        self._items: List[MusicItem] = []
+        self._models = models
 
-        self.canvas = tk.Canvas(self.list_frame)
-        self.scrollbar = ttk.Scrollbar(self.list_frame, orient="vertical", command=self.canvas.yview)
-        self.scrollable_frame = tk.Frame(self.canvas)
+        self._canvas = tk.Canvas(self._list_frame)
+        self._scrollbar = ttk.Scrollbar(self._list_frame, orient="vertical", command=self._canvas.yview)
+        self._scrollable_frame = tk.Frame(self._canvas)
 
-        self.scrollable_frame.bind(
+        self._scrollable_frame.bind(
             "<Configure>",
-            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+            lambda e: self._canvas.configure(scrollregion=self._canvas.bbox("all"))
         )
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
-        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+        self._canvas.create_window((0, 0), window=self._scrollable_frame, anchor="nw")
+        self._canvas.configure(yscrollcommand=self._scrollbar.set)
 
-        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self._canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self._scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+    def _on_play_music(self, music: Music):
+        self._models.current.set_current(music)
+
+    def _on_remove_music(self, music: Music):
+        self._models.playlist.remove(music)
+
+    def on_current_music_event(self, event: ModelEvent[CurrentSong]):
+        current_music = event.get().get_current()
+        for item in self._items:
+            if item.music() == current_music:
+                item.highlight()
+            else:
+                item.remove_highlight()
+
+    def on_playlist_event(self, event: ModelEvent[Playlist]):
+        for item in self._items:
+            item.destroy()
+        self._items = []
+        playlist = event.get().view()
+        for song in playlist:
+            item = MusicItem(self._list_frame, song, self._on_play_music, self._on_remove_music)
+
+        self._list_frame.pack()
 
 
-class SeekFrame:
-    def __init__(self, root: tk.Tk):
-        self._seekbar = ttk.Scale(root, from_=0, to=100, orient=tk.HORIZONTAL, command=self._on_scale_change)
+class SeekFrame(TimerEventListener, CurrentMusicEventListener):
+
+    def __init__(self, root: tk.Tk, models: Models):
+        self._models = models
+        self._root = root
+        self._seekbar = self._create_scale(1)
         self._seekbar.pack(pady=20, padx=20, fill=tk.X)
         self._is_moved_by_user = False
 
     def _on_scale_change(self, value):
-        pass
+        self._models.timer.update_time(value)
 
-    def update(self, new_value):
+    def _start_move(self, e):
+        self._is_moved_by_user = True
+
+    def _stop_move(self, e):
+        self._is_moved_by_user = False
+
+    def _create_scale(self, max_val: int) -> ttk.Scale:
+        scale = ttk.Scale(self._root, from_=0, to=max_val, orient=tk.HORIZONTAL, command=self._on_scale_change)
+        self._seekbar.bind("<Button-1>", self._start_move)
+        self._seekbar.bind("<B1-Motion>", self._start_move)
+        self._seekbar.bind("<ButtonRelease-1>", self._stop_move)
+        return scale
+
+    def _update(self, new_value):
         if self._is_moved_by_user:
             return
         self._seekbar.set(new_value)
+
+    def on_timer_event(self, event: ModelEvent[MusicTimer]):
+        time_millis = event.get().get_time_millis()
+        self._update(time_millis)
+
+    def on_current_music_event(self, event: ModelEvent[CurrentSong]):
+        duration = event.get().get_current().duration_millis
+        self._seekbar = self._create_scale(duration)
+
 
 
 class BottomPanel(PlaybackEventListener, MusicStateEventListener):
 
     def __init__(self, root: tk.Tk, models: Models):
         self._models = models
-        self.bottom_frame = tk.Frame(root)
-        self.bottom_frame.pack(fill=tk.X, side=tk.BOTTOM, pady=5)
+        self._bottom_frame = tk.Frame(root)
+        self._bottom_frame.pack(fill=tk.X, side=tk.BOTTOM, pady=5)
 
-        self.time_label = tk.Label(self.bottom_frame, text="00:00")
-        self.time_label.pack(side=tk.LEFT, padx=10)
+        self._time_label = tk.Label(self._bottom_frame, text="00:00")
+        self._time_label.pack(side=tk.LEFT, padx=10)
 
-        self.play_button = tk.Button(self.bottom_frame, text="Play", command=self._on_play_pause)
-        self.play_button.pack(side=tk.LEFT, padx=5)
+        self._play_button = tk.Button(self._bottom_frame, text="▶️", command=self._on_play_pause)
+        self._play_button.pack(side=tk.LEFT, padx=5)
 
-        self.repeat_button = tk.Button(self.bottom_frame, text="No repeat")
-        self.repeat_button.pack(side=tk.LEFT, padx=5)
+        self._repeat_button = tk.Button(self._bottom_frame, text=self._repeat_text(self._models.state.get_record().repeat_option))
+        self._repeat_button.pack(side=tk.LEFT, padx=5)
 
-        tk.Label(self.bottom_frame, text="Speed:").pack(side=tk.LEFT, padx=(20, 5))
-        self.speed_var = tk.StringVar(value="1.0")
+        tk.Label(self._bottom_frame, text="Speed:").pack(side=tk.LEFT, padx=(20, 5))
+        self._speed_var = tk.StringVar(value="1.0")
         validator = (root.register(self._validate_speed), "%P")
-        self.speed_spin = tk.Spinbox(
-            self.bottom_frame,
+        self._speed_spin = tk.Spinbox(
+            self._bottom_frame,
             from_=0.1,
             to=8.0,
             increment=0.1,
             width=5,
-            textvariable=self.speed_var,
+            textvariable=self._speed_var,
             validate="key",
             validatecommand=validator,
             command=self._on_speed_change
         )
-        self.speed_spin.pack(side=tk.LEFT)
-        self.speed_spin.bind("<Return>", self._on_enter)
+        self._speed_spin.pack(side=tk.LEFT)
+        self._speed_spin.bind("<Return>", self._on_enter)
+
+        self._volume_var = tk.IntVar(value=models.state.get_record().volume)
+
+        self.volume_slider = tk.Scale(
+            self._bottom_frame,
+            from_=0,
+            to=100,
+            orient=tk.HORIZONTAL,
+            variable=self._volume_var,
+            command=self._on_volume_change
+        )
+        self.volume_slider.pack(side=tk.LEFT)
 
     def _on_play_pause(self):
         playback = self._models.playback.get_playback()
@@ -166,10 +249,10 @@ class BottomPanel(PlaybackEventListener, MusicStateEventListener):
             self._models.state.set_repeat_option(RepeatOption.NO_REPEAT)
 
     def _on_speed_change(self):
-        self._models.state.set_speed(float(self.speed_spin.get()))
+        self._models.state.set_speed(float(self._speed_spin.get()))
 
-    def _on_volume_change(self):
-        self._models.state.set_volume(100)
+    def _on_volume_change(self, value):
+        self._models.state.set_volume(int(round(float(value))))
 
     def _validate_speed(self, new_value):
         if new_value == "":
@@ -182,26 +265,44 @@ class BottomPanel(PlaybackEventListener, MusicStateEventListener):
 
     def _on_enter(self, _):
         try:
-            value = float(self.speed_var.get())
+            value = float(self._speed_var.get())
         except ValueError:
             value = 1
         if value < 0.1:
             value = 0.1
         elif value > 8:
             value = 8
-        self.speed_var.set(f"{value:.1f}")
+        self._speed_var.set(f"{value:.1f}")
         self._on_speed_change()
 
     def on_music_state_event(self, event: ModelEvent[MusicState]):
-        pass
+        record = event.get().get_record()
+        self._repeat_button.config(text=self._repeat_text(record.repeat_option))
+        self._speed_var.set(value=f"{record.speed}")
+        self._volume_var.set(value=record.volume)
 
     def on_playback_changed(self, event: ModelEvent[Playback]):
-        pass
+        playback = event.get().get_playback()
+        if playback == PlaybackState.PLAYING:
+            self._play_button.config(text="⏸️")
+        else:
+            self._play_button.config(text="▶️")
+
+    def _repeat_text(self, repeat: RepeatOption) -> str:
+        if repeat == RepeatOption.NO_REPEAT:
+            return "No repeat"
+        elif repeat == RepeatOption.REPEAT_ALL:
+            return "Repeat all"
+        elif repeat == RepeatOption.REPEAT_ONE:
+            return "Repeat one"
+        else:
+            return "!ERR!"
+
 
 class CoreLayout:
-    def __init__(self, root: tk.Tk, models: Models, subs: Subscribers):
-        self._control = ControlFrame(root, models)
-        self._seek = SeekFrame(root)
-        self._music_list = MusicList(root)
-        self._bottom_panel = BottomPanel(root)
+    def __init__(self, root: tk.Tk, models: Models, services: Services, subs: Subscribers):
+        self._control = ControlFrame(root, models, services.load_service)
+        self._seek = SeekFrame(root, models)
+        self._music_list = MusicList(root, models)
+        self._bottom_panel = BottomPanel(root, models)
         subs.subscribe_all([self._seek, self._music_list, self._bottom_panel])

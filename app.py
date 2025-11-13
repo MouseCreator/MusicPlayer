@@ -1,34 +1,31 @@
 import tkinter as tk
-from typing import List
 
+from cache_service import CacheService
+from model.models import Models
 from model.music import Music
-from database import DataBase
 from elements import CoreLayout
-from events import EventRegistry
-from player.PygletPlayer import PygletPlayer
+from service.models_initializer import ModelsInitializerImpl, ModelsInitializer
+from service.services import Services
+from service.subscribers import Subscribers
+
 
 class Application:
     core: CoreLayout | None
+    services: Services | None
+    models: Models | None
+    subscribers: Subscribers | None
+
     def __init__(self):
         self.root = tk.Tk()
-        self.event_registry = EventRegistry()
-        self.database = DataBase(self.event_registry)
-        self.player = PygletPlayer()
-        self.core = None
-
-    def _setup_layout(self):
-        self.core = CoreLayout(self.root, self.event_registry, self.database)
 
     def begin(self):
-        self._setup_layout()
-        self.player.set_file('melodies/melody.wav')
+        self.subscribers = Subscribers()
+        cache_service = CacheService()
+        models_initializer = ModelsInitializerImpl(cache_service, self.subscribers)
+        self.models = models_initializer.init_models()
+        self.services = Services(self.subscribers, self.models)
+        self.core = CoreLayout(self.root, self.models, self.services, self.subscribers)
         self.root.mainloop()
-
-    def load(self, music_list: List[Music]):
-        if not music_list:
-            return
-        self.core.add_music(music_list)
-        self.select(music_list[0])
 
     def select(self, music: Music):
         pass
