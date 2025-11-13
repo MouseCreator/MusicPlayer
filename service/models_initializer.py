@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar
 
-from cache_service import CacheService
+from service.cache_service import CacheService
 from model.callback import Callback
 from model.current import CurrentSong
 from model.load_state import LoadState
@@ -46,7 +46,7 @@ class ModelsInitializerImpl(ModelsInitializer):
 
     def init_models(self) -> Models:
         callbacks = _CallbackGenerator(self._subs)
-        cache = self._cache_service.load_cache()
+        cache = self._cache_service.get_cache()
 
         initial_settings = StateRecord()
         initial_settings.speed = 1.0

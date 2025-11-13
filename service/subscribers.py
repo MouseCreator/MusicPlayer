@@ -49,7 +49,10 @@ class MappedSubscribers(Subscribers):
         for listener_type, event_type, method_name in listener_map:
             if isinstance(listener, listener_type):
                 callback = getattr(listener, method_name)
-                self._handlers[event_type].append(callback)
+                if event_type in self._handlers:
+                    self._handlers[event_type].append(callback)
+                else:
+                    self._handlers[event_type] = [callback]
 
     def publish(self, event: ModelEvent[T]):
         payload_type = event.generic()

@@ -1,3 +1,5 @@
+import os
+import uuid
 from typing import List
 
 from model.models import Models
@@ -9,7 +11,22 @@ class LoadService:
         self._models = models
 
     def _convert_list(self, files: List[str]) -> List[Music]:
-        pass
+        music_list = []
+
+        for filename in files:
+            music = Music()
+            music.id = uuid.uuid4().int
+            full_name = os.path.abspath(filename)
+            base_name = os.path.basename(filename)
+            name, ext = os.path.splitext(base_name)
+
+            music.filename = full_name
+            music.extension = ext.lstrip(".")
+            music.name = name
+
+            music_list.append(music)
+
+        return music_list
 
     def load_files(self, files: List[str]) -> None:
         if not files:

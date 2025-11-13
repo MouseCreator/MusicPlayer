@@ -1,12 +1,13 @@
 import tkinter as tk
 
-from cache_service import CacheService
+
 from model.models import Models
 from model.music import Music
 from elements import CoreLayout
-from service.models_initializer import ModelsInitializerImpl, ModelsInitializer
+from service.cache_service import CacheService
+from service.models_initializer import ModelsInitializerImpl
 from service.services import Services
-from service.subscribers import Subscribers
+from service.subscribers import Subscribers, MappedSubscribers
 
 
 class Application:
@@ -19,7 +20,7 @@ class Application:
         self.root = tk.Tk()
 
     def begin(self):
-        self.subscribers = Subscribers()
+        self.subscribers = MappedSubscribers()
         cache_service = CacheService()
         models_initializer = ModelsInitializerImpl(cache_service, self.subscribers)
         self.models = models_initializer.init_models()

@@ -1,11 +1,10 @@
-import os
 
 from model.cached_data import CachedData
 from model.load_state import LoadState
 from model.model_event import LoadStateEventListener, MusicStateEventListener, ModelEvent
 from model.music import RepeatOption
 from model.musicstate import MusicState
-from service.proprty_file_service import PropertyFileService, PropertyFileServiceImpl
+from service.property_file_service import PropertyFileService, PropertyFileServiceImpl
 
 
 class CacheService(LoadStateEventListener, MusicStateEventListener):
@@ -14,6 +13,7 @@ class CacheService(LoadStateEventListener, MusicStateEventListener):
                  cache_file: str = "cache.txt"):
         self._cache_file = cache_file
         self._file_service = property_file_service
+        self._load()
 
     def _load(self):
         props = self._file_service.load(self._cache_file)

@@ -12,6 +12,8 @@ class Music:
         self.filename = ""
         self.extension = ""
         self.name = ""
+    def __eq__(self, other):
+        return self.id == other.id
 
 class RepeatOption(Enum):
     NO_REPEAT = 1

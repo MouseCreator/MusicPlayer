@@ -1,6 +1,6 @@
 from typing import Self
 
-from callback import Callback, EmptyCallback
+from model.callback import Callback, EmptyCallback
 from model.music import RepeatOption
 
 
@@ -10,10 +10,16 @@ class StateRecord:
     repeat_option: RepeatOption
 
     def __init__(self):
-        pass
+        self.volume = 100
+        self.speed = 1
+        self.repeat_option = RepeatOption.NO_REPEAT
 
     def clone(self) -> Self:
-        pass
+        record = StateRecord()
+        record.volume = self.volume
+        record.speed = self.speed
+        record.repeat_option = self.repeat_option
+        return record
 
 def initial_data() -> StateRecord:
     record = StateRecord()

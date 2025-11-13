@@ -167,9 +167,9 @@ class SeekFrame(TimerEventListener, CurrentMusicEventListener):
 
     def _create_scale(self, max_val: int) -> ttk.Scale:
         scale = ttk.Scale(self._root, from_=0, to=max_val, orient=tk.HORIZONTAL, command=self._on_scale_change)
-        self._seekbar.bind("<Button-1>", self._start_move)
-        self._seekbar.bind("<B1-Motion>", self._start_move)
-        self._seekbar.bind("<ButtonRelease-1>", self._stop_move)
+        scale.bind("<Button-1>", self._start_move)
+        scale.bind("<B1-Motion>", self._start_move)
+        scale.bind("<ButtonRelease-1>", self._stop_move)
         return scale
 
     def _update(self, new_value):
