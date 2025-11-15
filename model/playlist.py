@@ -52,3 +52,8 @@ class Playlist:
     def at_index(self, index: int):
         return self._music_list[index]
 
+    def swap_index(self, from_index, to_index):
+        song = self._music_list.pop(from_index)
+        self._music_list.insert(to_index, song)
+        self._callback.call(self)
+

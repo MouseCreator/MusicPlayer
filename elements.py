@@ -69,20 +69,42 @@ class MusicItem:
                  parent: tk.Frame,
                  music: Music,
                  on_play: Callable[[Music], None],
-                 on_remove: Callable[[Music], None]
+                 on_remove: Callable[[Music], None],
+                 on_drag_start,
+                 on_drag_motion,
+                 on_drag_release
                  ):
         self._on_play = on_play
         self._on_remove = on_remove
+
+        self._on_drag_start = on_drag_start
+        self._on_drag_motion = on_drag_motion
+        self._on_drag_release = on_drag_release
+
         self._music = music
-        self._item_frame = tk.Frame(parent, bd=1, relief=tk.RAISED, padx=5, pady=5)
-        self._item_frame.pack(fill=tk.X, pady=2)
+        self.item_frame = tk.Frame(parent, bd=1, relief=tk.RAISED, padx=5, pady=5)
+        self.item_frame.pack(fill=tk.X, pady=2)
 
-        tk.Label(self._item_frame, text=music.name, anchor="w").pack(side=tk.LEFT, fill=tk.X, expand=True)
+        self._name_label = tk.Label(self.item_frame, text=music.name, anchor="w")
+        self._name_label.pack(side=tk.LEFT, fill=tk.X, expand=True)
         dur_text = display_time(music.duration_millis)
-        tk.Label(self._item_frame, text=dur_text, width=6, anchor="e").pack(side=tk.LEFT, padx=5)
+        self._dur_label = tk.Label(self.item_frame, text=dur_text, width=6, anchor="e")
+        self._dur_label.pack(side=tk.LEFT, padx=5)
 
-        tk.Button(self._item_frame, text="Play", width=6, command=self._play).pack(side=tk.LEFT, padx=2)
-        tk.Button(self._item_frame, text="Remove", width=7, command=self._remove).pack(side=tk.LEFT, padx=2)
+        tk.Button(self.item_frame, text="Play", width=6, command=self._play).pack(side=tk.LEFT, padx=2)
+        tk.Button(self.item_frame, text="Remove", width=7, command=self._remove).pack(side=tk.LEFT, padx=2)
+
+        self.item_frame.bind("<ButtonPress-1>", self._drag_start)
+        self.item_frame.bind("<B1-Motion>", self._drag_motion)
+        self.item_frame.bind("<ButtonRelease-1>", self._drag_release)
+
+        self._dur_label.bind("<ButtonPress-1>", self._drag_start)
+        self._dur_label.bind("<B1-Motion>", self._drag_motion)
+        self._dur_label.bind("<ButtonRelease-1>", self._drag_release)
+
+        self._name_label.bind("<ButtonPress-1>", self._drag_start)
+        self._name_label.bind("<B1-Motion>", self._drag_motion)
+        self._name_label.bind("<ButtonRelease-1>", self._drag_release)
 
     def _play(self):
         self._on_play(self._music)
@@ -90,16 +112,25 @@ class MusicItem:
         self._on_remove(self._music)
 
     def highlight(self):
-        self._item_frame['bg'] = 'lightblue'
+        self.item_frame['bg'] = 'lightblue'
 
     def remove_highlight(self):
-        self._item_frame['bg'] = 'white'
+        self.item_frame['bg'] = 'white'
 
     def destroy(self):
-        self._item_frame.destroy()
+        self.item_frame.destroy()
 
     def music(self):
         return self._music
+
+    def _drag_start(self, event):
+        self._on_drag_start(self, event)
+
+    def _drag_motion(self, event):
+        self._on_drag_motion(self, event)
+
+    def _drag_release(self, event):
+        self._on_drag_release(self, event)
 
 
 class MusicList(PlaylistEventListener, CurrentMusicEventListener):
@@ -158,11 +189,73 @@ class MusicList(PlaylistEventListener, CurrentMusicEventListener):
         self._items = []
         playlist = event.get().view()
         for song in playlist:
-            item = MusicItem(self._scrollable_frame, song, self._on_play_music, self._on_remove_music)
+            item = MusicItem(
+                self._scrollable_frame,
+                song,
+                self._on_play_music,
+                self._on_remove_music,
+                self._on_drag_start_item,
+                self._on_drag_motion_item,
+                self._on_drag_release_item
+            )
             self._items.append(item)
         self._apply_highlights(self._models.current.get_current())
         self._list_frame.pack()
         self._canvas.pack(fill=tk.BOTH, expand=True)
+
+    def _on_drag_start_item(self, item: MusicItem, event):
+        self._drag_item = item
+        self._drag_start_y = event.y_root
+        self._drag_index_start = self._items.index(item)
+        item.item_frame.configure(relief=tk.SUNKEN)
+
+
+    def _on_drag_motion_item(self, item: MusicItem, event):
+        if self._drag_item is None:
+            return
+
+        y = event.y_root
+        delta = y - self._drag_start_y
+
+        if abs(delta) < 5:
+            return
+
+        abs_y = self._canvas.winfo_pointery() - self._scrollable_frame.winfo_rooty()
+
+        target_index = None
+        for i, it in enumerate(self._items):
+            y1 = it.item_frame.winfo_y()
+            y2 = y1 + it.item_frame.winfo_height()
+            if y1 <= abs_y <= y2:
+                target_index = i
+                break
+
+        if target_index is None:
+            return
+
+        current_index = self._items.index(self._drag_item)
+        if target_index != current_index:
+            self._items.pop(current_index)
+            self._items.insert(target_index, self._drag_item)
+
+            for it in self._items:
+                it.item_frame.pack_forget()
+            for it in self._items:
+                it.item_frame.pack(fill=tk.X, pady=2)
+
+    def _on_drag_release_item(self, item: MusicItem, event):
+        if self._drag_item is None:
+            return
+
+        new_index = self._items.index(self._drag_item)
+        self._drag_item.item_frame.configure(relief=tk.RAISED)
+
+        if new_index != self._drag_index_start:
+            playlist = self._models.playlist
+            playlist.swap_index(self._drag_index_start, new_index)
+
+        self._drag_item = None
+        self._drag_index_start = None
 
 
 class SeekFrame(TimerEventListener, CurrentMusicEventListener):
@@ -269,7 +362,8 @@ class BottomPanel(CurrentMusicEventListener, TimerEventListener, PlaybackEventLi
             self._models.state.set_repeat_option(RepeatOption.REPEAT_ONE)
         elif repeat == RepeatOption.REPEAT_ONE:
             self._models.state.set_repeat_option(RepeatOption.NO_REPEAT)
-        self._models.state.set_repeat_option(repeat)
+        else:
+            self._models.state.set_repeat_option(repeat)
 
     def _on_speed_change(self):
         self._models.state.set_speed(float(self._speed_spin.get()))
@@ -300,10 +394,11 @@ class BottomPanel(CurrentMusicEventListener, TimerEventListener, PlaybackEventLi
 
     def on_music_state_event(self, event: ModelEvent[MusicState]):
         record = event.get().get_record()
-        self._repeat_button.config(text=self._repeat_text(record.repeat_option))
-        self._repeat_button.pack(side=tk.LEFT, padx=5)
-        self._speed_var.set(value=f"{record.speed}")
-        self._volume_var.set(value=record.volume)
+        self._repeat_button.config(
+            text=self._repeat_text(record.repeat_option)
+        )
+        self._speed_var.set(str(record.speed))
+        self._volume_var.set(record.volume)
 
     def on_playback_changed(self, event: ModelEvent[Playback]):
         playback = event.get().get_playback()
