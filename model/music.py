@@ -6,8 +6,8 @@ class Music:
     filename: str
     extension: str
     name: str
-    def __init__(self):
-        self.id = ""
+    def __init__(self, identity: str = ""):
+        self.id = identity
         self.duration_millis = 0
         self.filename = ""
         self.extension = ""

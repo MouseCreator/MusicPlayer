@@ -1,5 +1,7 @@
-from random import shuffle
 from typing import List, Self
+
+from algorithm.shuffle_algorithm import shuffle_list
+from algorithm.sort_algorithm import sort_list
 from model.music import Music
 from model.callback import Callback, EmptyCallback
 
@@ -31,11 +33,11 @@ class Playlist:
         self._callback.call(self)
 
     def shuffle(self):
-        shuffle(self._music_list)
+        self._music_list = shuffle_list(self._music_list)
         self._callback.call(self)
 
     def sort(self):
-        # sort(self._music_list)
+        self._music_list = sort_list(self._music_list)
         self._callback.call(self)
 
     def view(self) -> List[Music]:
