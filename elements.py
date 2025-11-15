@@ -205,7 +205,7 @@ class SeekFrame(TimerEventListener, CurrentMusicEventListener):
 
 
 
-class BottomPanel(TimerEventListener, PlaybackEventListener, MusicStateEventListener):
+class BottomPanel(CurrentMusicEventListener, TimerEventListener, PlaybackEventListener, MusicStateEventListener):
 
     def __init__(self, root: tk.Tk, models: Models):
         self._models = models
@@ -218,7 +218,11 @@ class BottomPanel(TimerEventListener, PlaybackEventListener, MusicStateEventList
         self._play_button = tk.Button(self._bottom_frame, text="▶️", command=self._on_play_pause)
         self._play_button.pack(side=tk.LEFT, padx=5)
 
-        self._repeat_button = tk.Button(self._bottom_frame, text=self._repeat_text(self._models.state.get_record().repeat_option))
+        self._repeat_button = tk.Button(
+            self._bottom_frame,
+            text=self._repeat_text(self._models.state.get_record().repeat_option),
+            command=self._on_repeat
+        )
         self._repeat_button.pack(side=tk.LEFT, padx=5)
 
         tk.Label(self._bottom_frame, text="Speed:").pack(side=tk.LEFT, padx=(20, 5))
@@ -297,6 +301,7 @@ class BottomPanel(TimerEventListener, PlaybackEventListener, MusicStateEventList
     def on_music_state_event(self, event: ModelEvent[MusicState]):
         record = event.get().get_record()
         self._repeat_button.config(text=self._repeat_text(record.repeat_option))
+        self._repeat_button.pack(side=tk.LEFT, padx=5)
         self._speed_var.set(value=f"{record.speed}")
         self._volume_var.set(value=record.volume)
 
@@ -320,6 +325,9 @@ class BottomPanel(TimerEventListener, PlaybackEventListener, MusicStateEventList
         millis = event.get().time_millis
         self._time_label.config(text=display_time(millis))
         self._time_label.pack(side=tk.LEFT, padx=10)
+
+    def on_current_music_event(self, event: ModelEvent[CurrentSong]):
+        self._time_label.config(text=display_time(0))
 
 
 class CoreLayout:

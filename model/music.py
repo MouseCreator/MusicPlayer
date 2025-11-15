@@ -15,6 +15,12 @@ class Music:
     def __eq__(self, other):
         return self.id == other.id
 
+    def __lt__(self, other):
+        return self.name.lower() < other.name.lower()
+
+    def __le__(self, other):
+        return self.name.lower() <= other.name.lower()
+
 class RepeatOption(Enum):
     NO_REPEAT = 1
     REPEAT_ONE = 2

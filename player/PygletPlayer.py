@@ -1,4 +1,5 @@
 from model.music import PlaybackState
+from model.musicstate import MusicState
 from player.abstract_player import AbstractPlayer
 import pyglet
 from typing import Optional
@@ -42,6 +43,13 @@ class _TimeUpdate:
 
 
 class PygletPlayer(AbstractPlayer):
+    def __init__(self, state: MusicState) -> None:
+        self._player: pyglet.media.Player = pyglet.media.Player()
+        self._source: Optional[pyglet.media.Source] = None
+        self._paused: bool = False
+        self._ended: bool = False
+        self._time_update = _TimeUpdate()
+        self._state = state
 
     def update(self) -> None:
         if not self._has_media():
@@ -53,13 +61,6 @@ class PygletPlayer(AbstractPlayer):
             self._ended = True
             self._player.pause()
             self._time_update.end()
-
-    def __init__(self) -> None:
-        self._player: pyglet.media.Player = pyglet.media.Player()
-        self._source: Optional[pyglet.media.Source] = None
-        self._paused: bool = False
-        self._ended: bool = False
-        self._time_update = _TimeUpdate()
 
     def _has_media(self) -> bool:
         return self._source is not None
@@ -74,6 +75,10 @@ class PygletPlayer(AbstractPlayer):
         self._player.eos_action = 'pause'
         self._paused = False
         self._ended = False
+
+        record = self._state.get_record()
+        self.set_volume(record.volume)
+        self.set_speed(record.speed)
 
         @self._player.event
         def on_eos():
