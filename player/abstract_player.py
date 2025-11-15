@@ -39,3 +39,6 @@ class AbstractPlayer(ABC):
     @abstractmethod
     def set_time_millis(self, millis: int):
         pass
+    @abstractmethod
+    def update(self) -> None:
+        pass

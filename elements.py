@@ -205,7 +205,7 @@ class SeekFrame(TimerEventListener, CurrentMusicEventListener):
 
 
 
-class BottomPanel(PlaybackEventListener, MusicStateEventListener):
+class BottomPanel(TimerEventListener, PlaybackEventListener, MusicStateEventListener):
 
     def __init__(self, root: tk.Tk, models: Models):
         self._models = models
@@ -316,6 +316,10 @@ class BottomPanel(PlaybackEventListener, MusicStateEventListener):
             return "Repeat one"
         else:
             return "!ERR!"
+    def on_timer_event(self, event: ModelEvent[MusicTimerEvent]):
+        millis = event.get().time_millis
+        self._time_label.config(text=display_time(millis))
+        self._time_label.pack(side=tk.LEFT, padx=10)
 
 
 class CoreLayout:

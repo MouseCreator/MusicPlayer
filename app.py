@@ -18,6 +18,7 @@ class Application:
 
     def __init__(self):
         self.root = tk.Tk()
+        self.root.title("Music Player")
 
     def begin(self):
         self.subscribers = MappedSubscribers()
@@ -27,9 +28,6 @@ class Application:
         self.services = Services(self.subscribers, self.models)
         self.core = CoreLayout(self.root, self.models, self.services, self.subscribers)
         self.root.mainloop()
-
-    def select(self, music: Music):
-        pass
 
 
 if __name__ == '__main__':

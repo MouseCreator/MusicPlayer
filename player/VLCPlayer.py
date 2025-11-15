@@ -8,6 +8,15 @@ os.add_dll_directory(os.getcwd())
 import vlc
 
 class VLCPlayer(AbstractPlayer):
+    def set_volume(self, volume: int):
+        pass
+
+    def set_speed(self, speed: float):
+        pass
+
+    def update(self) -> None:
+        pass
+
     def get_state(self) -> PlaybackState:
         return PlaybackState.FINISHED
 

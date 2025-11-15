@@ -5,6 +5,15 @@ from model.music import PlaybackState
 from player.abstract_player import AbstractPlayer
 
 class PyGamePlayer(AbstractPlayer):
+    def set_volume(self, volume: int):
+        pass
+
+    def set_speed(self, speed: float):
+        pass
+
+    def update(self) -> None:
+        pass
+
     def __init__(self):
         pygame.mixer.init()
         self.filepath = None

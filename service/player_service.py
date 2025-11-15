@@ -44,6 +44,7 @@ class PlayerService(MusicStateEventListener, CurrentMusicEventListener, Playback
         self._player.set_volume(music_record.volume)
 
     def update_time_job(self):
+        self._player.update()
         time_played = self._player.get_time_millis()
         player_state = self._player.get_state()
         if player_state == PlaybackState.PLAYING:
