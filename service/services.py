@@ -1,5 +1,5 @@
 from model.models import Models
-from player.PygletPlayer import PygletPlayer
+from player.VLCPlayer import VLCPlayer
 from service.async_service import AsyncService
 from service.cache_service import CacheService
 from service.load_service import LoadService
@@ -19,7 +19,7 @@ class Services:
         self.cache_service = CacheService()
         self.repeat_service = RepeatService(models)
         self.async_service = AsyncService()
-        self.player_service = PlayerService(PygletPlayer(models.state), models, self.repeat_service)
+        self.player_service = PlayerService(VLCPlayer(models.state), models, self.repeat_service)
         self.async_service.schedule_every("update_time", 100, self.player_service.update_time_job)
         service_list = [self.cache_service, self.player_service]
         subs.subscribe_all(service_list)
