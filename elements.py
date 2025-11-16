@@ -127,10 +127,10 @@ class MusicItem:
         self._on_drag_start(self, event)
 
     def _drag_motion(self, event):
-        self._on_drag_motion(self, event)
+        self._on_drag_motion(event)
 
     def _drag_release(self, event):
-        self._on_drag_release(self, event)
+        self._on_drag_release()
 
 
 class MusicList(PlaylistEventListener, CurrentMusicEventListener):
@@ -210,7 +210,7 @@ class MusicList(PlaylistEventListener, CurrentMusicEventListener):
         item.item_frame.configure(relief=tk.SUNKEN)
 
 
-    def _on_drag_motion_item(self, item: MusicItem, event):
+    def _on_drag_motion_item(self, event):
         if self._drag_item is None:
             return
 
@@ -243,7 +243,7 @@ class MusicList(PlaylistEventListener, CurrentMusicEventListener):
             for it in self._items:
                 it.item_frame.pack(fill=tk.X, pady=2)
 
-    def _on_drag_release_item(self, item: MusicItem, event):
+    def _on_drag_release_item(self):
         if self._drag_item is None:
             return
 
