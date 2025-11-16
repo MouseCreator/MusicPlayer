@@ -305,7 +305,7 @@ class BottomPanel(CurrentMusicEventListener, TimerEventListener, PlaybackEventLi
         self._bottom_frame = tk.Frame(root)
         self._bottom_frame.pack(fill=tk.X, side=tk.BOTTOM, pady=5)
 
-        self._time_label = tk.Label(self._bottom_frame, text="00:00")
+        self._time_label = tk.Label(self._bottom_frame, text=display_time(0))
         self._time_label.pack(side=tk.LEFT, padx=10)
 
         self._play_button = tk.Button(self._bottom_frame, text="▶️", command=self._on_play_pause)
@@ -319,7 +319,7 @@ class BottomPanel(CurrentMusicEventListener, TimerEventListener, PlaybackEventLi
         self._repeat_button.pack(side=tk.LEFT, padx=5)
 
         tk.Label(self._bottom_frame, text="Speed:").pack(side=tk.LEFT, padx=(20, 5))
-        self._speed_var = tk.StringVar(value="1.0")
+        self._speed_var = tk.StringVar(value="1.00")
         validator = (root.register(self._validate_speed), "%P")
         self._speed_spin = tk.Spinbox(
             self._bottom_frame,
@@ -389,7 +389,7 @@ class BottomPanel(CurrentMusicEventListener, TimerEventListener, PlaybackEventLi
             value = 0.1
         elif value > 8:
             value = 8
-        self._speed_var.set(f"{value:.1f}")
+        self._speed_var.set(f"{value:.2f}")
         self._on_speed_change()
 
     def on_music_state_event(self, event: ModelEvent[MusicState]):
