@@ -5,7 +5,6 @@ from service.cache_service import CacheService
 from model.callback import Callback
 from model.current import CurrentSong
 from model.load_state import LoadState
-from model.model_event import ModelEvent
 from model.models import Models
 from model.musicstate import MusicState, StateRecord
 from model.playback import Playback
@@ -26,7 +25,7 @@ class EventCallback(Callback[T]):
     def __init__(self, subs: Subscribers):
         self._subs = subs
     def call(self, t: T) -> None:
-        self._subs.publish(event)
+        self._subs.publish(t)
 
 
 class _CallbackGenerator:

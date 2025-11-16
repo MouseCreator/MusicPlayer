@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 
 from model.cached_data import CachedData
 from model.load_state import LoadState
@@ -6,8 +7,12 @@ from model.music import RepeatOption
 from model.musicstate import MusicState
 from service.property_file_service import PropertyFileService, PropertyFileServiceImpl
 
+class CacheService(ABC):
+    @abstractmethod
+    def get_cache(self) -> CachedData:
+        pass
 
-class CacheService(LoadStateEventListener, MusicStateEventListener):
+class FileCacheService(LoadStateEventListener, MusicStateEventListener):
     _cache: CachedData
     def __init__(self, property_file_service: PropertyFileService = PropertyFileServiceImpl(),
                  cache_file: str = "cache.txt"):

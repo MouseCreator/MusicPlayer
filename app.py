@@ -3,7 +3,7 @@ import tkinter as tk
 from model.model_event import ListenerMapProvider
 from model.models import Models
 from ui.elements import CoreLayout
-from service.cache_service import CacheService
+from service.cache_service import FileCacheService
 from service.models_initializer import ModelsInitializerImpl
 from service.services import Services
 from service.subscribers import Subscribers, MappedSubscribers
@@ -21,7 +21,7 @@ class Application:
 
     def begin(self):
         self.subscribers = MappedSubscribers(ListenerMapProvider.provide())
-        cache_service = CacheService()
+        cache_service = FileCacheService()
         models_initializer = ModelsInitializerImpl(cache_service, self.subscribers)
         self.models = models_initializer.init_models()
         self.services = Services(self.subscribers, self.models)
