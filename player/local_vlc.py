@@ -115,7 +115,7 @@ def find_lib():
         dll = ctypes.CDLL(p)
 
     elif sys.platform.startswith("darwin"):
-        # FIXME: should find a means to configure path
+
         d = "/Applications/VLC.app/Contents/MacOS/"
         c = d + "lib/libvlccore.dylib"
         p = d + "lib/libvlc.dylib"
@@ -5181,7 +5181,7 @@ class EventUnion(ctypes.Union):
         ("new_status", ctypes.c_int),
         ("media", ctypes.c_void_p),
         ("new_state", ctypes.c_uint),
-        # FIXME: Media instance
+
         ("new_cache", ctypes.c_float),
         ("new_position", ctypes.c_float),
         ("new_time", ctypes.c_longlong),
@@ -5190,7 +5190,7 @@ class EventUnion(ctypes.Union):
         ("new_pausable", ctypes.c_longlong),
         ("new_scrambled", ctypes.c_longlong),
         ("new_count", ctypes.c_longlong),
-        # FIXME: Skipped MediaList and MediaListView...
+
         ("filename", ctypes.c_char_p),
         ("new_length", ctypes.c_longlong),
     ]
@@ -12839,7 +12839,7 @@ if __name__ == "__main__":
         # Instance() call above, see <https://www.videolan.org/doc/play-howto/en/ch04.html>
         player.video_set_marquee_int(VideoMarqueeOption.Enable, 1)
         player.video_set_marquee_int(VideoMarqueeOption.Size, 24)  # pixels
-        # FIXME: This crashes the module - it should be investigated
+
         # player.video_set_marquee_int(VideoMarqueeOption.Position, Position.bottom)
         if False:  # only one marquee can be specified
             player.video_set_marquee_int(
