@@ -26,7 +26,6 @@ class EventCallback(Callback[T]):
     def __init__(self, subs: Subscribers):
         self._subs = subs
     def call(self, t: T) -> None:
-        event = ModelEvent(t)
         self._subs.publish(event)
 
 

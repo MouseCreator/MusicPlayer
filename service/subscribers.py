@@ -7,7 +7,7 @@ T = TypeVar('T')
 
 class Subscribers(ABC):
     @abstractmethod
-    def publish(self, event: ModelEvent):
+    def publish(self, event: T):
         pass
     @abstractmethod
     def subscribe(self, listener: EventListener):
@@ -33,7 +33,8 @@ class MappedSubscribers(Subscribers):
                 else:
                     self._handlers[event_type] = [callback]
 
-    def publish(self, event: ModelEvent[T]):
+    def publish(self, t: T):
+        event = ModelEvent(t)
         payload_type = event.generic()
         handlers = self._handlers.get(payload_type)
         if not handlers:
