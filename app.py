@@ -1,8 +1,7 @@
 import tkinter as tk
 
-
+from model.model_event import ListenerMapProvider
 from model.models import Models
-from model.music import Music
 from elements import CoreLayout
 from service.cache_service import CacheService
 from service.models_initializer import ModelsInitializerImpl
@@ -21,7 +20,7 @@ class Application:
         self.root.title("Music Player")
 
     def begin(self):
-        self.subscribers = MappedSubscribers()
+        self.subscribers = MappedSubscribers(ListenerMapProvider.provide())
         cache_service = CacheService()
         models_initializer = ModelsInitializerImpl(cache_service, self.subscribers)
         self.models = models_initializer.init_models()

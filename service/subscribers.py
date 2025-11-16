@@ -1,14 +1,7 @@
 from abc import abstractmethod, ABC
-from typing import TypeVar, Dict, Type, List, Callable
+from typing import TypeVar, Type, List, Tuple
 
-from model.current import CurrentSong
-from model.load_state import LoadState
-from model.model_event import ModelEvent, EventListener, LoadStateEventListener, MusicStateEventListener, \
-    PlaylistEventListener, TimerEventListener, CurrentMusicEventListener, PlaybackEventListener
-from model.musicstate import MusicState
-from model.playback import Playback
-from model.playlist import Playlist
-from model.timer import MusicTimer, MusicTimerEvent
+from model.model_event import ModelEvent, EventListener
 
 T = TypeVar('T')
 
@@ -24,29 +17,15 @@ class Subscribers(ABC):
         for listener in listeners:
             self.subscribe(listener)
 
-
 class MappedSubscribers(Subscribers):
 
-    def __init__(self):
-        self._handlers: Dict[Type, List[Callable[[ModelEvent], None]]] = {
-            CurrentSong: [],
-            MusicTimer: [],
-            Playlist: [],
-            MusicState: [],
-            LoadState: [],
-        }
+    def __init__(self, listener_map: List[Tuple[Type[EventListener], Type, str]]):
+        self.listener_map = listener_map
+        self._handlers = {}
 
     def subscribe(self, listener: EventListener):
-        listener_map = [
-            (CurrentMusicEventListener, CurrentSong, "on_current_music_event"),
-            (TimerEventListener,        MusicTimerEvent,  "on_timer_event"),
-            (PlaylistEventListener,     Playlist,    "on_playlist_event"),
-            (MusicStateEventListener,   MusicState,  "on_music_state_event"),
-            (LoadStateEventListener,    LoadState,   "on_load_sate_event"),
-            (PlaybackEventListener,     Playback,    "on_playback_changed")
-        ]
 
-        for listener_type, event_type, method_name in listener_map:
+        for listener_type, event_type, method_name in self.listener_map:
             if isinstance(listener, listener_type):
                 callback = getattr(listener, method_name)
                 if event_type in self._handlers:

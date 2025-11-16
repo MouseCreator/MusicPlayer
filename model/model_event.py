@@ -55,3 +55,15 @@ class PlaybackEventListener(EventListener):
     @abstractmethod
     def on_playback_changed(self, event: ModelEvent[Playback]):
         pass
+
+class ListenerMapProvider:
+    @staticmethod
+    def provide():
+        return [
+            (CurrentMusicEventListener, CurrentSong, "on_current_music_event"),
+            (TimerEventListener,        MusicTimerEvent,  "on_timer_event"),
+            (PlaylistEventListener,     Playlist,    "on_playlist_event"),
+            (MusicStateEventListener,   MusicState,  "on_music_state_event"),
+            (LoadStateEventListener,    LoadState,   "on_load_sate_event"),
+            (PlaybackEventListener,     Playback,    "on_playback_changed")
+        ]
