@@ -2,7 +2,7 @@ import tkinter as tk
 
 from model.model_event import ListenerMapProvider
 from model.models import Models
-from elements import CoreLayout
+from ui.elements import CoreLayout
 from service.cache_service import CacheService
 from service.models_initializer import ModelsInitializerImpl
 from service.services import Services
