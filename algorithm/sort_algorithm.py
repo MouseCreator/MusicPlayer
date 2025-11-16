@@ -1,12 +1,12 @@
-from typing import TypeVar, List
+from typing import TypeVar, List, Callable
 
 T = TypeVar('T')
 
-def _merge(left: List[T], right: List[T]) -> List[T]:
+def _merge(left: List[T], right: List[T], key: Callable[[T], any]) -> List[T]:
     merged = []
     i = j = 0
     while i < len(left) and j < len(right):
-        if left[i] <= right[j]:
+        if key(left[i]) <= key(right[j]):
             merged.append(left[i])
             i += 1
         else:
@@ -18,10 +18,10 @@ def _merge(left: List[T], right: List[T]) -> List[T]:
 
     return merged
 
-def sort_list(element_list: List[T]) -> List[T]:
+def sort_list(element_list: List[T], key: Callable[[T], any] = lambda x: x) -> List[T]:
     if len(element_list) <= 1:
         return element_list[:]
     mid = len(element_list) // 2
     left = sort_list(element_list[:mid])
     right = sort_list(element_list[mid:])
-    return _merge(left, right)
+    return _merge(left, right, key)
