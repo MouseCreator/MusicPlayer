@@ -159,10 +159,7 @@ class VLCException(Exception):
     pass
 
 
-try:
-    _Ints = (int, long)
-except NameError:  # no long in Python 3+
-    _Ints = int
+_Ints = int
 _Seqs = (list, tuple)
 
 
