@@ -9,18 +9,19 @@ from service.property_file_service import PropertyFileService, PropertyFileServi
 
 class CacheService(ABC):
     @abstractmethod
-    def get_cache(self) -> CachedData:
+    def load_cache(self) -> CachedData:
         pass
+    @abstractmethod
+    def save_cache(self, data: CachedData):
+        pass
+class FileCacheService(CacheService):
 
-class FileCacheService(CacheService, LoadStateEventListener, MusicStateEventListener):
-    _cache: CachedData
     def __init__(self, property_file_service: PropertyFileService = PropertyFileServiceImpl(),
                  cache_file: str = "cache.txt"):
         self._cache_file = cache_file
         self._file_service = property_file_service
-        self._load()
 
-    def _load(self):
+    def load_cache(self) -> CachedData:
         props = self._file_service.load(self._cache_file)
         last_folder = props.get("last_folder")
         last_volume = int(props.get("last_volume", 50))
@@ -33,27 +34,33 @@ class FileCacheService(CacheService, LoadStateEventListener, MusicStateEventList
         data.last_folder = last_folder
         data.last_volume = last_volume
         data.last_repeat = last_repeat
-        self._cache = data
-        if not self._file_service.exists(self._cache_file):
-            self._save()
 
-    def _save(self):
+        if not self._file_service.exists(self._cache_file):
+            self.save_cache(data)
+        return data
+    def save_cache(self, data: CachedData):
         props = {
-            "last_folder": self._cache.last_folder or "",
-            "last_volume": str(self._cache.last_volume),
-            "repeat_option": str(self._cache.last_repeat.value),
+            "last_folder": data.last_folder or "",
+            "last_volume": str(data.last_volume),
+            "repeat_option": str(data.last_repeat.value),
         }
         self._file_service.save(self._cache_file, props)
 
-    def get_cache(self) -> CachedData:
-        return self._cache.clone()
+
+class FileCacheListener(LoadStateEventListener, MusicStateEventListener):
+    _cache: CachedData
+    def __init__(self, cache_service: CacheService, initial_cache: CachedData | None = None):
+        self._cache_service = cache_service
+        self._cache = initial_cache
+        if not self._cache:
+            self._cache = cache_service.load_cache()
 
     def on_music_state_event(self, event: ModelEvent[MusicState]):
         self._cache.last_repeat = event.get().get_record().repeat_option
         self._cache.last_volume = event.get().get_record().volume
-        self._save()
+        self._cache_service.save_cache(self._cache)
 
     def on_load_sate_event(self, event: ModelEvent[LoadState]):
         self._cache.last_folder = event.get().get_last_folder()
-        self._save()
+        self._cache_service.save_cache(self._cache)
 

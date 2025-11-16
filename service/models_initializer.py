@@ -44,7 +44,7 @@ class ModelsInitializerImpl(ModelsInitializer):
 
     def init_models(self) -> Models:
         callbacks = _CallbackGenerator(self._subs)
-        cache = self._cache_service.get_cache()
+        cache = self._cache_service.load_cache()
 
         initial_settings = StateRecord()
         initial_settings.speed = 1.0

@@ -38,7 +38,7 @@ def test_subscribers():
 
 
 class MockedCache(CacheService):
-    def get_cache(self) -> CachedData:
+    def load_cache(self) -> CachedData:
         data = CachedData()
         data.last_folder = ''
         data.last_repeat = RepeatOption.NO_REPEAT
