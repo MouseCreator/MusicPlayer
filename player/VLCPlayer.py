@@ -135,6 +135,10 @@ class VLCPlayer(AbstractPlayer):
         v = max(0, min(100, volume))
         self._player.audio_set_volume(v)
 
+
     def set_speed(self, speed: float):
         pct = max(0.1, speed)
         self._expected_speed = pct
+        if self._has_media():
+            self._player.set_rate(pct)
+            self._time_update.set_rate(pct)

@@ -16,7 +16,7 @@ from model.timer import MusicTimerEvent
 from service.load_service import LoadService
 from service.services import Services
 from service.subscribers import Subscribers
-from utils import display_time
+from ui.utils import display_time
 
 
 class FileLoader:
