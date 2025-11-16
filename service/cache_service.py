@@ -12,7 +12,7 @@ class CacheService(ABC):
     def get_cache(self) -> CachedData:
         pass
 
-class FileCacheService(LoadStateEventListener, MusicStateEventListener):
+class FileCacheService(CacheService, LoadStateEventListener, MusicStateEventListener):
     _cache: CachedData
     def __init__(self, property_file_service: PropertyFileService = PropertyFileServiceImpl(),
                  cache_file: str = "cache.txt"):
