@@ -24,7 +24,6 @@ class MappedSubscribers(Subscribers):
         self._handlers = {}
 
     def subscribe(self, listener: EventListener):
-
         for listener_type, event_type, method_name in self.listener_map:
             if isinstance(listener, listener_type):
                 callback = getattr(listener, method_name)

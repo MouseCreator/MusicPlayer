@@ -14,6 +14,7 @@ class CacheService(ABC):
     @abstractmethod
     def save_cache(self, data: CachedData):
         pass
+
 class FileCacheService(CacheService):
 
     def __init__(self, property_file_service: PropertyFileService = PropertyFileServiceImpl(),
