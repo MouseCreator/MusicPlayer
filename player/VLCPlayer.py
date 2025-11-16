@@ -1,8 +1,6 @@
 import os
 from pathlib import Path
 
-
-
 from player.local_vlc import Instance, MediaPlayer, Media, EventType, MediaParseFlag
 
 from typing import Optional
@@ -27,6 +25,7 @@ class VLCPlayer(AbstractPlayer):
         self._ended: bool = False
         self._time_update = TimeUpdate()
         self._state = music_state
+        self._expected_speed = self._state.get_record().speed
 
         self._duration_ms: int = 0
 
@@ -89,6 +88,8 @@ class VLCPlayer(AbstractPlayer):
         if not self._has_media() or self._ended:
             return
         self._player.play()
+        self._player.set_rate(self._expected_speed)
+        self._time_update.set_rate(self._expected_speed)
         self._paused = False
         self._time_update.begin()
 
@@ -131,20 +132,9 @@ class VLCPlayer(AbstractPlayer):
         self._ended = False
 
     def set_volume(self, volume: int):
-        if not self._has_media():
-            return
         v = max(0, min(100, volume))
         self._player.audio_set_volume(v)
 
     def set_speed(self, speed: float):
-        if not self._has_media():
-            return
         pct = max(0.1, speed)
-        # Must be playing for rate change to apply
-        was_playing = self._player.is_playing()
-        if not was_playing:
-            self._player.play()
-        self._player.set_rate(pct)
-        if not was_playing:
-            self._player.pause()
-        self._time_update.set_rate(pct)
+        self._expected_speed = pct

@@ -111,7 +111,6 @@ def find_lib():
         libname = "libvlc.dll"
         dll_lib = Path(__file__).resolve().parent.parent / 'dll' / libname
         p = str(dll_lib)
-        print('line 112', p)
         plugin_path = os.path.dirname(p)
         dll = ctypes.CDLL(p)
 
