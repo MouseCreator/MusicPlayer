@@ -1,6 +1,7 @@
 from typing import List
 from uuid import uuid4
 
+from algorithm.collection_helper import CustomMusicCollectionHelper
 from model.callback import EmptyCallback
 from model.music import Music
 from model.playlist import Playlist
@@ -23,7 +24,7 @@ def _init_list() -> List[Music]:
     ]
 
 def test_sort_playlist():
-    playlist = Playlist(EmptyCallback())
+    playlist = Playlist(EmptyCallback(), CustomMusicCollectionHelper())
     playlist.append(_init_list())
 
     assert len(playlist.view()) == 4

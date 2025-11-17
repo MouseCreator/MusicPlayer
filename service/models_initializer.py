@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar
 
+from algorithm.collection_helper import CustomMusicCollectionHelper
 from service.cache_service import CacheService
 from model.callback import Callback
 from model.current import CurrentSong
@@ -52,7 +53,7 @@ class ModelsInitializerImpl(ModelsInitializer):
         initial_settings.repeat_option = cache.last_repeat
 
         current = CurrentSong(callback=callbacks.generate_event())
-        playlist = Playlist(callback=callbacks.generate_event())
+        playlist = Playlist(callback=callbacks.generate_event(), collection_helper=CustomMusicCollectionHelper())
         state = MusicState(callback=callbacks.generate_event(), initial=initial_settings)
         timer = MusicTimer(callback=callbacks.generate_event())
         load_state = LoadState(callback=callbacks.generate_event(), last_folder=cache.last_folder)

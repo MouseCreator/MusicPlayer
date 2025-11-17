@@ -14,7 +14,9 @@ class PlayerService(MusicStateEventListener, CurrentMusicEventListener, Playback
 
     _player: AbstractPlayer
 
-    def __init__(self, player: AbstractPlayer, models: Models, repeat_service: RepeatService):
+    def __init__(self,
+                 player: AbstractPlayer,
+                 models: Models, repeat_service: RepeatService):
         self._player = player
         self._models = models
         self._repeat_service = repeat_service

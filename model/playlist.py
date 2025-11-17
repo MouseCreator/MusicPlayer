@@ -1,19 +1,19 @@
 from typing import List, Self
 
-from algorithm.shuffle_algorithm import shuffle_list
-from algorithm.sort_algorithm import sort_list
+from algorithm.collection_helper import MusicCollectionHelper
 from model.music import Music
 from model.callback import Callback, EmptyCallback
 
 
 class Playlist:
 
-    def __init__(self, callback: Callback[Self] | None):
+    def __init__(self, callback: Callback[Self] | None, collection_helper: MusicCollectionHelper):
         if not callback:
             callback = EmptyCallback()
 
         self._callback = callback
         self._music_list = []
+        self._collection_helper = collection_helper
 
     def append(self, music_list: List[Music]):
         self._music_list.extend(music_list)
@@ -33,11 +33,11 @@ class Playlist:
         self._callback.call(self)
 
     def shuffle(self):
-        self._music_list = shuffle_list(self._music_list)
+        self._music_list = self._collection_helper.shuffle(self._music_list)
         self._callback.call(self)
 
     def sort(self):
-        self._music_list = sort_list(self._music_list)
+        self._music_list = self._collection_helper.sort(self._music_list)
         self._callback.call(self)
 
     def view(self) -> List[Music]:
