@@ -1,4 +1,2 @@
-pygame==2.6.1
-pyglet==2.1.11
 mutagen==1.47.0
 pytest==9.0.1
