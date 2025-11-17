@@ -346,10 +346,10 @@ class BottomPanelController:
             self._models.state.set_repeat_option(repeat)
 
     def on_speed_change(self, speed: float):
-        pass
+        self._models.state.set_speed(speed)
 
     def on_volume_change(self, volume: int):
-        pass
+        self._models.state.set_volume(volume)
 
     def get_repeat_option(self):
         return self._models.state.get_record().repeat_option
