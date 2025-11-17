@@ -64,6 +64,6 @@ class ListenerMapProvider:
             (TimerEventListener,        MusicTimerEvent,  "on_timer_event"),
             (PlaylistEventListener,     Playlist,    "on_playlist_event"),
             (MusicStateEventListener,   MusicState,  "on_music_state_event"),
-            (LoadStateEventListener,    LoadState,   "on_load_sate_event"),
+            (LoadStateEventListener,    LoadState,   "on_load_state_event"),
             (PlaybackEventListener,     Playback,    "on_playback_changed")
         ]

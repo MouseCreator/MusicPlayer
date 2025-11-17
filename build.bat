@@ -1,0 +1,3 @@
+rm -rf dist
+echo Building app...
+pyinstaller --windowed --add-data "dll;dll" --name "Music Player" app.py

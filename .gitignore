@@ -2,3 +2,6 @@
 .idea/
 melodies/
 cache.txt
+dist/
+build/
+app.spec
