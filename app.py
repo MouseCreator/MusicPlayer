@@ -1,12 +1,10 @@
 import tkinter as tk
 
-from model.model_event import ListenerMapProvider
 from model.models import Models
+from setup import ManualSystemSetup
 from ui.elements import CoreLayout
-from service.cache_service import FileCacheService
-from service.models_initializer import ModelsInitializerImpl
 from service.services import Services
-from service.subscribers import Subscribers, MappedSubscribers
+from service.subscribers import Subscribers
 
 
 class Application:
@@ -20,12 +18,8 @@ class Application:
         self.root.title("Music Player")
 
     def begin(self):
-        self.subscribers = MappedSubscribers(ListenerMapProvider.provide())
-        cache_service = FileCacheService()
-        models_initializer = ModelsInitializerImpl(cache_service, self.subscribers)
-        self.models = models_initializer.init_models()
-        self.services = Services(self.subscribers, self.models)
-        self.core = CoreLayout(self.root, self.models, self.services, self.subscribers)
+        system = ManualSystemSetup().create()
+        self.core = CoreLayout(self.root, system.controllers, system.subscribers)
         self.root.mainloop()
 
 

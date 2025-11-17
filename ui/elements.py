@@ -475,10 +475,17 @@ class BottomPanel(CurrentMusicEventListener, TimerEventListener, PlaybackEventLi
         self._time_label.config(text=display_time(0))
 
 
+class ControllerLayer:
+    def __init__(self, models: Models, services: Services):
+        self.control = ControlFrameController(models, services.load_service)
+        self.music_list = MusicListController(models)
+        self.seek = SeekFrameController(models)
+        self.bottom = BottomPanelController(models)
+
 class CoreLayout:
-    def __init__(self, root: tk.Tk, models: Models, services: Services, subs: Subscribers):
-        self._control = ControlFrame(root, models, services.load_service)
-        self._music_list = MusicList(root, models)
-        self._seek = SeekFrame(root, models)
-        self._bottom_panel = BottomPanel(root, models)
+    def __init__(self, root: tk.Tk, controllers: ControllerLayer, subs: Subscribers):
+        self._control = ControlFrame(root, controllers.control)
+        self._music_list = MusicList(root, controllers.music_list)
+        self._seek = SeekFrame(root, controllers.seek)
+        self._bottom_panel = BottomPanel(root, controllers.bottom)
         subs.subscribe_all([self._seek, self._music_list, self._bottom_panel])
