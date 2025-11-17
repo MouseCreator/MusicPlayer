@@ -35,3 +35,14 @@ def test_sort_playlist():
 
     for i, s in enumerate(view):
         assert s.name == chr(ord('a') + i)
+
+def test_shuffle_playlist():
+    playlist = Playlist(EmptyCallback(), CustomMusicCollectionHelper())
+    playlist.append(_init_list())
+
+    assert len(playlist.view()) == 4
+    before = playlist.view()
+    playlist.shuffle()
+    after = playlist.view()
+    assert len(before) == len(after)
+    assert len(set(before)) == len(set(after))

@@ -15,6 +15,9 @@ class Music:
     def __eq__(self, other):
         return self.id == other.id
 
+    def __hash__(self):
+        return hash(self.id)
+
     def __lt__(self, other):
         return self.name.lower() < other.name.lower()
 
