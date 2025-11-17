@@ -48,7 +48,7 @@ class MusicStateEventListener(EventListener):
 
 class LoadStateEventListener(EventListener):
     @abstractmethod
-    def on_load_sate_event(self, event: ModelEvent[LoadState]):
+    def on_load_state_event(self, event: ModelEvent[LoadState]):
         pass
 
 class PlaybackEventListener(EventListener):

@@ -61,7 +61,7 @@ class FileCacheListener(LoadStateEventListener, MusicStateEventListener):
         self._cache.last_volume = event.get().get_record().volume
         self._cache_service.save_cache(self._cache)
 
-    def on_load_sate_event(self, event: ModelEvent[LoadState]):
+    def on_load_state_event(self, event: ModelEvent[LoadState]):
         self._cache.last_folder = event.get().get_last_folder()
         self._cache_service.save_cache(self._cache)
 
