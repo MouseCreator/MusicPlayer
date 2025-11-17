@@ -6,3 +6,4 @@ dist/
 build/
 app.spec
 Music Player.spec
+installer
