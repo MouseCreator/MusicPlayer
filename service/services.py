@@ -1,7 +1,7 @@
 from model.models import Models
 from player.VLCPlayer import VLCPlayer
 from service.async_service import AsyncService
-from service.cache_service import FileCacheService, FileCacheListener
+from service.cache_service import FileCacheListener, CacheService
 from service.load_service import LoadService
 from service.player_service import PlayerService
 from service.repeat_service import RepeatService
@@ -12,11 +12,11 @@ class Services:
     load_service: LoadService
     repeat_service: RepeatService
     player_service: PlayerService
-    cache_service: FileCacheService
+    cache_service: CacheService
 
-    def __init__(self, subs: Subscribers, models: Models):
+    def __init__(self, subs: Subscribers, models: Models, cache_service: CacheService):
         self.load_service = LoadService(models)
-        self.cache_service = FileCacheService()
+        self.cache_service = cache_service
         self.repeat_service = RepeatService(models)
         self.async_service = AsyncService()
         self.cache_listener = FileCacheListener(self.cache_service)

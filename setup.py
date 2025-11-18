@@ -45,6 +45,6 @@ class ManualSystemSetup(SetupSystem):
         cache_service = FileCacheService(cache_file=self.params.cache_file)
         models_initializer = ModelsInitializerImpl(cache_service, subscribers)
         models = models_initializer.init_models()
-        services = Services(subscribers, models)
+        services = Services(subscribers, models, cache_service)
         controllers = ControllerLayer(models, services)
         return System(services, models, subscribers, controllers)
