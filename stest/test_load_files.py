@@ -34,3 +34,16 @@ class LoadingSTest(unittest.TestCase):
         system.controllers.bottom.on_pause()
         assert system.models.playback.get_playback() == PlaybackState.PAUSED
         assert 1500 < system.services.player_service.get_time_millis() < 2500
+
+    def test_play_selected_melodies(self):
+        system = _before_each()
+        system.controllers.control.load_file(_music_files_provider)
+
+        assert system.models.current.get_current() == system.models.playlist.view()[0]
+        system.controllers.music_list.on_play_music(system.models.playlist.view()[1])
+
+        assert system.models.current.get_current() == system.models.playlist.view()[1]
+        system.controllers.music_list.on_play_music(system.models.playlist.view()[2])
+
+        assert system.models.current.get_current() == system.models.playlist.view()[2]
+        system.controllers.bottom.on_pause()
