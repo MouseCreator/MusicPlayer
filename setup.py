@@ -8,6 +8,9 @@ from service.services import Services
 from service.subscribers import Subscribers, MappedSubscribers
 from ui.elements import ControllerLayer
 
+class Params:
+    def __init__(self):
+        self.cache_file = "cache.txt"
 
 class System:
     services: Services | None
@@ -29,10 +32,17 @@ class SetupSystem(ABC):
     def create(self) -> System:
         pass
 
+
+
 class ManualSystemSetup(SetupSystem):
+    def __init__(self, params: Params | None = None):
+        if not params:
+            params = Params()
+        self.params = params
+
     def create(self) -> System:
         subscribers = MappedSubscribers(ListenerMapProvider.provide())
-        cache_service = FileCacheService()
+        cache_service = FileCacheService(cache_file=self.params.cache_file)
         models_initializer = ModelsInitializerImpl(cache_service, subscribers)
         models = models_initializer.init_models()
         services = Services(subscribers, models)

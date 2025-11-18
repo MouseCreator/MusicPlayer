@@ -1,0 +1,3 @@
+last_folder=
+last_volume=0
+repeat_option=1
