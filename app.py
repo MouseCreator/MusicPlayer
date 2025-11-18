@@ -1,17 +1,12 @@
 import tkinter as tk
 
-from model.models import Models
 from setup import ManualSystemSetup
 from ui.elements import CoreLayout
-from service.services import Services
-from service.subscribers import Subscribers
 
 
 class Application:
     core: CoreLayout | None
-    services: Services | None
-    models: Models | None
-    subscribers: Subscribers | None
+    root: tk.Tk
 
     def __init__(self):
         self.root = tk.Tk()
