@@ -60,3 +60,9 @@ class PlayerService(MusicStateEventListener, CurrentMusicEventListener, Playback
     def on_timer_event(self, event: ModelEvent[MusicTimerEvent]):
         if event.get().is_manual:
             self._player.set_time_millis(event.get().time_millis)
+
+    def get_playing(self) -> bool:
+        return self._player.get_state() == PlaybackState.PLAYING
+
+    def get_time_millis(self):
+        return self._player.get_time_millis()

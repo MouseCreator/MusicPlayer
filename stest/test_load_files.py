@@ -32,3 +32,6 @@ class LoadingSTest(unittest.TestCase):
         system.controllers.control.load_file(_music_files_provider)
         sleep(2)
         system.controllers.bottom.on_pause()
+        sleep(0.1)
+        assert not system.services.player_service.get_playing()
+        assert 1500 < system.services.player_service.get_time_millis() < 2500
