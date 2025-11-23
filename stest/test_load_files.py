@@ -27,6 +27,32 @@ def _music_files_provider(_):
 
 class LoadingSTest(unittest.TestCase):
 
+    def test_change_options(self):
+        system = _before_each()
+        system.controllers.control.load_file(_music_files_provider)
+        system.controllers.bottom.on_pause()
+        assert system.models.playback.get_playback() == PlaybackState.PAUSED
+        sleep(1)
+        system.controllers.bottom.on_pause()
+        assert system.models.playback.get_playback() == PlaybackState.PLAYING
+        sleep(1)
+        system.controllers.bottom.on_pause()
+        assert system.models.playback.get_playback() == PlaybackState.PAUSED
+
+        system.controllers.bottom.on_volume_change(40)
+        assert system.models.state.get_record().volume == 40
+
+        system.controllers.bottom.on_speed_change(2)
+        assert system.models.state.get_record().speed == 2
+
+        assert system.models.state.get_record().repeat_option == RepeatOption.NO_REPEAT
+        system.controllers.bottom.on_repeat()
+        assert system.models.state.get_record().repeat_option == RepeatOption.REPEAT_ALL
+        system.controllers.bottom.on_repeat()
+        assert system.models.state.get_record().repeat_option == RepeatOption.REPEAT_ONE
+        system.controllers.bottom.on_repeat()
+        assert system.models.state.get_record().repeat_option == RepeatOption.NO_REPEAT
+
     def test_load_files(self):
         system = _before_each()
         system.controllers.control.load_file(_music_files_provider)
@@ -74,28 +100,4 @@ class LoadingSTest(unittest.TestCase):
         assert before_list[0] == after_list[1]
         assert before_list[1] == after_list[0]
 
-    def test_change_options(self):
-        system = _before_each()
-        system.controllers.control.load_file(_music_files_provider)
-        system.controllers.bottom.on_pause()
-        assert system.models.playback.get_playback() == PlaybackState.PAUSED
-        sleep(1)
-        system.controllers.bottom.on_pause()
-        assert system.models.playback.get_playback() == PlaybackState.PLAYING
-        sleep(1)
-        system.controllers.bottom.on_pause()
-        assert system.models.playback.get_playback() == PlaybackState.PAUSED
 
-        system.controllers.bottom.on_volume_change(40)
-        assert system.models.state.get_record().volume == 40
-
-        system.controllers.bottom.on_speed_change(2)
-        assert system.models.state.get_record().speed == 2
-
-        assert system.models.state.get_record().repeat_option == RepeatOption.NO_REPEAT
-        system.controllers.bottom.on_repeat()
-        assert system.models.state.get_record().repeat_option == RepeatOption.REPEAT_ALL
-        system.controllers.bottom.on_repeat()
-        assert system.models.state.get_record().repeat_option == RepeatOption.REPEAT_ONE
-        system.controllers.bottom.on_repeat()
-        assert system.models.state.get_record().repeat_option == RepeatOption.NO_REPEAT
