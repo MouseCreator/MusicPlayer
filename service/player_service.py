@@ -66,6 +66,3 @@ class PlayerService(MusicStateEventListener, CurrentMusicEventListener, Playback
 
     def get_time_millis(self):
         return self._player.get_time_millis()
-
-    def get_current(self):
-        return self._player.get_filename()

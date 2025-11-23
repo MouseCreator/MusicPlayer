@@ -91,21 +91,21 @@ class MusicItem:
         self._on_drag_release = on_drag_release
 
         self._music = music
-        self.item_frame = tk.Frame(parent, bd=1, relief=tk.RAISED, padx=5, pady=5)
-        self.item_frame.pack(fill=tk.X, pady=2)
+        self._item_frame = tk.Frame(parent, bd=1, relief=tk.RAISED, padx=5, pady=5)
+        self._item_frame.pack(fill=tk.X, pady=2)
 
-        self._name_label = tk.Label(self.item_frame, text=music.name, anchor="w")
+        self._name_label = tk.Label(self._item_frame, text=music.name, anchor="w")
         self._name_label.pack(side=tk.LEFT, fill=tk.X, expand=True)
         dur_text = display_time(music.duration_millis)
-        self._dur_label = tk.Label(self.item_frame, text=dur_text, width=6, anchor="e")
+        self._dur_label = tk.Label(self._item_frame, text=dur_text, width=6, anchor="e")
         self._dur_label.pack(side=tk.LEFT, padx=5)
 
-        tk.Button(self.item_frame, text="Play", width=6, command=self._play).pack(side=tk.LEFT, padx=2)
-        tk.Button(self.item_frame, text="Remove", width=7, command=self._remove).pack(side=tk.LEFT, padx=2)
+        tk.Button(self._item_frame, text="Play", width=6, command=self._play).pack(side=tk.LEFT, padx=2)
+        tk.Button(self._item_frame, text="Remove", width=7, command=self._remove).pack(side=tk.LEFT, padx=2)
 
-        self.item_frame.bind("<ButtonPress-1>", self._drag_start)
-        self.item_frame.bind("<B1-Motion>", self._drag_motion)
-        self.item_frame.bind("<ButtonRelease-1>", self._drag_release)
+        self._item_frame.bind("<ButtonPress-1>", self._drag_start)
+        self._item_frame.bind("<B1-Motion>", self._drag_motion)
+        self._item_frame.bind("<ButtonRelease-1>", self._drag_release)
 
         self._dur_label.bind("<ButtonPress-1>", self._drag_start)
         self._dur_label.bind("<B1-Motion>", self._drag_motion)
@@ -121,13 +121,13 @@ class MusicItem:
         self._on_remove(self._music)
 
     def highlight(self):
-        self.item_frame['bg'] = 'lightblue'
+        self._item_frame['bg'] = 'lightblue'
 
     def remove_highlight(self):
-        self.item_frame['bg'] = 'white'
+        self._item_frame['bg'] = 'white'
 
     def destroy(self):
-        self.item_frame.destroy()
+        self._item_frame.destroy()
 
     def music(self):
         return self._music
@@ -228,7 +228,7 @@ class MusicList(PlaylistEventListener, CurrentMusicEventListener):
         self._drag_item = item
         self._drag_start_y = event.y_root
         self._drag_index_start = self._items.index(item)
-        item.item_frame.configure(relief=tk.SUNKEN)
+        item._item_frame.configure(relief=tk.SUNKEN)
 
 
     def _on_drag_motion_item(self, event):
@@ -245,8 +245,8 @@ class MusicList(PlaylistEventListener, CurrentMusicEventListener):
 
         target_index = None
         for i, it in enumerate(self._items):
-            y1 = it.item_frame.winfo_y()
-            y2 = y1 + it.item_frame.winfo_height()
+            y1 = it._item_frame.winfo_y()
+            y2 = y1 + it._item_frame.winfo_height()
             if y1 <= abs_y <= y2:
                 target_index = i
                 break
@@ -260,16 +260,16 @@ class MusicList(PlaylistEventListener, CurrentMusicEventListener):
             self._items.insert(target_index, self._drag_item)
 
             for it in self._items:
-                it.item_frame.pack_forget()
+                it._item_frame.pack_forget()
             for it in self._items:
-                it.item_frame.pack(fill=tk.X, pady=2)
+                it._item_frame.pack(fill=tk.X, pady=2)
 
     def _on_drag_release_item(self):
         if self._drag_item is None:
             return
 
         new_index = self._items.index(self._drag_item)
-        self._drag_item.item_frame.configure(relief=tk.RAISED)
+        self._drag_item._item_frame.configure(relief=tk.RAISED)
 
         if new_index != self._drag_index_start:
             self._controller.swap_index(self._drag_index_start, new_index)
