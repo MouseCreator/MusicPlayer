@@ -47,3 +47,11 @@ class LoadingSTest(unittest.TestCase):
 
         assert system.models.current.get_current() == system.models.playlist.view()[2]
         system.controllers.bottom.on_pause()
+
+    def test_next_file_starts_playing(self):
+        system = _before_each()
+        system.controllers.control.load_file(_music_files_provider)
+
+    def test_can_manually_change_order(self):
+        system = _before_each()
+        system.controllers.control.load_file(_music_files_provider)

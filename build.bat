@@ -1,3 +1,3 @@
-rm -rf dist
+
 echo Building app...
-pyinstaller --windowed --add-data "dll;dll" --add-data "sample_cache.txt;cache.txt" --name "Music Player" app.py
+python -m PyInstaller --windowed --add-data "dll;dll" --add-data "sample_cache.txt;cache.txt" --name "Music Player" app.py --distpath installer --collect-all mutagen
