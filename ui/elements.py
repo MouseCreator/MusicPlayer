@@ -14,6 +14,7 @@ from model.playback import Playback
 from model.playlist import Playlist
 from model.timer import MusicTimerEvent
 from service.load_service import LoadService
+from service.logging import log_files
 from service.services import Services
 from service.subscribers import Subscribers
 from ui.utils import display_time
@@ -33,6 +34,7 @@ class FileLoader:
         )
         if not filenames:
             return None
+        log_files(filenames)
         abs_paths = [os.path.abspath(path) for path in filenames]
         return abs_paths
 

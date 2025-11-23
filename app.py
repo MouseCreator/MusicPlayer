@@ -1,5 +1,6 @@
 import tkinter as tk
 
+from service.logging import create_log
 from setup import ManualSystemSetup
 from ui.elements import CoreLayout
 
@@ -14,6 +15,7 @@ class Application:
 
     def begin(self):
         system = ManualSystemSetup().create()
+        create_log()
         self.core = CoreLayout(self.root, system.controllers, system.subscribers)
         self.root.mainloop()
 
