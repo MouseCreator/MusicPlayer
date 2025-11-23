@@ -1,4 +1,4 @@
-# Developer Guide
+# User Guide
 
 Music Player is a program for Windows that lets you play music files of different extensions.
 
@@ -53,6 +53,6 @@ The player has a Graphical user interface with the following elements:
 
 Enjoy the player!
 
-If you encounter any problems please reach us via GitHub or call +380 11 111 11 11.
+If you encounter any problems please reach us via GitHub, music.player.support@mail.com or call +380 11 111 11 11.
 
 
